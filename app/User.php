@@ -4,6 +4,7 @@ namespace App;
 
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Foundation\Auth\User as Authenticatable;
+use Illuminate\Support\Facades\Mail;
 
 class User extends Authenticatable
 {
@@ -26,4 +27,22 @@ class User extends Authenticatable
     protected $hidden = [
         'password', 'remember_token',
     ];
+
+    public function sendLinkToReset($token, $user)
+    {
+        $letter['from'] = 'book@gmail.com';
+        $letter['subject'] = 'Reset the password';
+
+        Mail::send('auth.passwords.forgot', compact('token'), function ($message) use ($letter, $user, $token){
+            $message->from($letter['from'])
+                ->to($user->email)
+                ->subject($letter['subject']);
+        });
+    }
+    public function generateToken()
+    {
+        $this->api_token = str_random(60);
+        $this->save();
+        return $this->api_token;
+    }
 }
