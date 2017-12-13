@@ -44,3 +44,6 @@ Route::post('/book', 'BookController@store');
 Route::put('/book/{book}', 'BookController@update');
 /** delete book */
 Route::delete('/book/{book}', 'BookController@destroy');
+Route::post('password/email', 'Auth\ForgotPasswordController@getResetToken');
+Route::post('password/reset', 'Auth\ResetPasswordController@reset');
+Route::post('user/reset-password', 'Auth\ResetPasswordController@userPasswordReset');
