@@ -20,6 +20,10 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
 Route::post('/register', 'Auth\RegisterController@register');
 Route::post('/login', 'Auth\LoginController@login');
 
+Route::post('password/email', 'Auth\ForgotPasswordController@getResetToken');
+Route::post('password/reset', 'Auth\ResetPasswordController@reset');
+Route::post('user/reset-password', 'Auth\ResetPasswordController@userPasswordReset');
+
 /** FOLDERS */
 /** show folders list */
 Route::get('/folder', 'FolderController@index');
@@ -47,3 +51,8 @@ Route::delete('/book/{book}', 'BookController@destroy');
 Route::post('password/email', 'Auth\ForgotPasswordController@getResetToken');
 Route::post('password/reset', 'Auth\ResetPasswordController@reset');
 Route::post('user/reset-password', 'Auth\ResetPasswordController@userPasswordReset');
+
+
+/** UPLOAD */
+Route::get('/upload',['as' => 'upload_form', 'uses' => 'UploadController@getForm']);
+Route::post('/upload',['as' => 'upload_file','uses' => 'UploadController@upload']);
