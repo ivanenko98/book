@@ -72,3 +72,8 @@ Route::post('/book', 'BookController@store');
 Route::put('/book/{book}', 'BookController@update');
 /** delete book */
 Route::delete('/book/{book}', 'BookController@destroy');
+
+
+/** UPLOAD */
+Route::get('/upload',['as' => 'upload_form', 'uses' => 'UploadController@getForm']);
+Route::post('/upload',['as' => 'upload_file','uses' => 'UploadController@upload']);

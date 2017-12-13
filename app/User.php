@@ -43,6 +43,7 @@ class User extends Authenticatable
     {
         $this->api_token = str_random(60);
         $this->save();
+
         return $this->api_token;
     }
 
@@ -53,4 +54,5 @@ class User extends Authenticatable
     public function folders(){
         return $this->hasMany(Folder::class);
     }
+
 }
