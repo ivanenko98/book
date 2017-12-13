@@ -22,5 +22,6 @@ class UploadController extends Controller
             }
         }
         return "Успех";
+
     }
 }
