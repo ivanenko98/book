@@ -19,8 +19,8 @@ class CreateBooksTable extends Migration
             $table->string('name', 255);
             $table->text('content');
             $table->string('author', 255);
-            $table->integer('likes');
-            $table->integer('percent');
+            $table->integer('likes')->default(0);
+            $table->integer('percent')->default(0);
             $table->timestamps();
         });
 
