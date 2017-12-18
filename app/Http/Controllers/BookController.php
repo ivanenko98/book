@@ -43,12 +43,13 @@ class BookController extends Controller
     /**
      * Display the specified resource.
      *
-     * @param  int  $id
+     * @param Book $book
      * @return \Illuminate\Http\Response
+     * @internal param int $id
      */
     public function show(Book $book)
     {
-        $book = Folder::find($book->id);
+        $book = Book::find($book->id);
         return $book;
     }
 
@@ -66,9 +67,10 @@ class BookController extends Controller
     /**
      * Update the specified resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
+     * @param  \Illuminate\Http\Request $request
+     * @param Book $book
      * @return \Illuminate\Http\Response
+     * @internal param int $id
      */
     public function update(Request $request, Book $book)
     {
@@ -79,8 +81,9 @@ class BookController extends Controller
     /**
      * Remove the specified resource from storage.
      *
-     * @param  int  $id
+     * @param Book $book
      * @return \Illuminate\Http\Response
+     * @internal param int $id
      */
     public function destroy(Book $book)
     {

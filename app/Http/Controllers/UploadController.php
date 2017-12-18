@@ -32,13 +32,13 @@ class UploadController extends Controller
             $docPDF = new PDFText();
             $docPDF->setFilename(storage_path('docs') . '/' . $this->filename);
             $docPDF->decodePDF();
-            $docPDF->output();
+//            dd($docPDF->output());
 
             $this->createBook($request->folder_id, $request->name, $docPDF->output(), $request->author);
         }
         if ($this->getExtension($this->filename) == 'docx') {
             $docText = new DOCXText();
-
+//            dd($docText->readDocx(storage_path('docs').'/'.$this->filename));
             $this->createBook($request->folder_id, $request->name, $docText->readDocx(storage_path('docs').'/'.$this->filename), $request->author);
         }
     }
