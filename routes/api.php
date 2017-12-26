@@ -17,12 +17,15 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
     return $request->user();
 });
 
-Route::post('/register', 'Auth\RegisterController@register');
-Route::post('/login', 'Auth\LoginController@login');
+Route::group(['middleware' => 'api-response'], function () {
+    Route::post('/register', 'Auth\RegisterController@register');
+    Route::post('/login', 'Auth\LoginController@login');
 
-Route::post('password/email', 'Auth\ForgotPasswordController@getResetToken');
-Route::post('password/reset', 'Auth\ResetPasswordController@reset');
-Route::post('user/reset-password', 'Auth\ResetPasswordController@userPasswordReset');
+    Route::post('password/email', 'Auth\ForgotPasswordController@getResetToken');
+    Route::post('password/reset', 'Auth\ResetPasswordController@reset');
+    Route::post('user/reset-password', 'Auth\ResetPasswordController@userPasswordReset');
+});
+
 
 /** FOLDERS */
 /** show folders list */

@@ -45,7 +45,7 @@ class User extends Authenticatable
         $this->save();
 
         return $this->api_token;
-}
+    }
     public function books(){
         return $this->hasMany(Book::class);
     }
