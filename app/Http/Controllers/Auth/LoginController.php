@@ -68,5 +68,6 @@ class LoginController extends Controller
         }
 
         return ['message' => 'User logged out.'];
+//        return Redirect::to('users/login')->with('message', 'Your are now logged out!');
     }
 }
