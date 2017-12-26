@@ -43,7 +43,8 @@ class BookController extends Controller
     /**
      * Display the specified resource.
      *
-     * @param Book $book
+     * @param \App\Book $book
+     *
      * @return \Illuminate\Http\Response
      * @internal param int $id
      */
@@ -67,10 +68,9 @@ class BookController extends Controller
     /**
      * Update the specified resource in storage.
      *
-     * @param  \Illuminate\Http\Request $request
-     * @param Book $book
+     * @param  \Illuminate\Http\Request  $request
+     * @param  int  $id
      * @return \Illuminate\Http\Response
-     * @internal param int $id
      */
     public function update(Request $request, Book $book)
     {
@@ -81,9 +81,8 @@ class BookController extends Controller
     /**
      * Remove the specified resource from storage.
      *
-     * @param Book $book
+     * @param  int  $id
      * @return \Illuminate\Http\Response
-     * @internal param int $id
      */
     public function destroy(Book $book)
     {

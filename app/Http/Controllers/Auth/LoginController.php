@@ -32,7 +32,6 @@ class LoginController extends Controller
     /**
      * Create a new controller instance.
      *
-     * @return void
      */
     public function __construct()
     {
@@ -61,10 +60,14 @@ class LoginController extends Controller
 
     public function logout(Request $request)
     {
-        $user = Auth::user();
-        $user->api_token = null;
-        $user->save();
-        return ['message' => 'User logged out.'];
-    }
+        $user = Auth::guard('api')->user();
 
+        if ($user) {
+            $user->api_token = null;
+            $user->save();
+        }
+
+        return ['message' => 'User logged out.'];
+//        return Redirect::to('users/login')->with('message', 'Your are now logged out!');
+    }
 }

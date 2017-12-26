@@ -3,12 +3,12 @@
 namespace App\Http\Controllers;
 
 use App\Book;
-use App\DOCXText;
 use App\Http\Requests\UploadRequest;
 use App\Page;
-use App\PDFText;
+use Convertio\Convertio;
 use Illuminate\Http\Request;
 use Illuminate\Http\Testing\File;
+
 
 class UploadController extends Controller
 {
@@ -29,64 +29,45 @@ class UploadController extends Controller
         }
 
         if ($this->getExtension($this->filename) == 'pdf') {
-            $docPDF = new PDFText();
-            $docPDF->setFilename(storage_path('docs') . '/' . $this->filename);
-            $docPDF->decodePDF();
-
-            $text = $docPDF->output();
-
-            $c = 'ssssssssssernioessssssssssssssssssssssssssssssssssssssssssssssssssssssssernioesssssssssssssssssssssss. ssssssssssernioessssssssssssssssssssssssssssssssssssssssssssssssssssssssernioesssssssssssssssssssssss. ssssssssssernioessssssssssssssssssssssssssssssssssssssssssssssssssssssssernioesssssssssssssssssssssss. ssssssssssernioessssssssssssssssssssssssssssssssssssssssssssssssssssssssernioesssssssssssssssssssssss. ssssssssssernioessssssssssssssssssssssssssssssssssssssssssssssssssssssssernioesssssssssssssssssssssss. ssssssssssernioessssssssssssssssssssssssssssssssssssssssssssssssssssssssernioesssssssssssssssssssssss. ssssssssssernioessssssssssssssssssssssssssssssssssssssssssssssssssssssssernioesssssssssssssssssssssss. ssssssssssernioessssssssssssssssssssssssssssssssssssssssssssssssssssssssernioesssssssssssssssssssssss. ssssssssssernioessssssssssssssssssssssssssssssssssssssssssssssssssssssssernioesssssssssssssssssssssss. ssssssssssernioessssssssssssssssssssssssssssssssssssssssssssssssssssssssernioesssssssssssssssssssssss. ssssssssssernioessssssssssssssssssssssssssssssssssssssssssssssssssssssssernioesssssssssssssssssssssss. ssssssssssernioessssssssssssssssssssssssssssssssssssssssssssssssssssssssernioesssssssssssssssssssssss. ssssssssssernioessssssssssssssssssssssssssssssssssssssssssssssssssssssssernioesssssssssssssssssssssss. ssssssssssernioessssssssssssssssssssssssssssssssssssssssssssssssssssssssernioesssssssssssssssssssssss. ssssssssssernioessssssssssssssssssssssssssssssssssssssssssssssssssssssssernioesssssssssssssssssssssss. ssssssssssernioessssssssssssssssssssssssssssssssssssssssssssssssssssssssernioesssssssssssssssssssssss. ssssssssssernioessssssssssssssssssssssssssssssssssssssssssssssssssssssssernioesssssssssssssssssssssss. ssssssssssernioessssssssssssssssssssssssssssssssssssssssssssssssssssssssernioesssssssssssssssssssssss. ssssssssssernioessssssssssssssssssssssssssssssssssssssssssssssssssssssssernioesssssssssssssssssssssss. ssssssssssernioessssssssssssssssssssssssssssssssssssssssssssssssssssssssernioesssssssssssssssssssssss. ';
-
+            $API = new Convertio("4a05d9904fc8070fa1d0e165d00bf3df");           // You can obtain API Key here: https://convertio.co/api/
+            $text = $API->start(storage_path('docs').'/'.$this->filename, 'txt')->wait()->fetchResultContent()->result_content;
+            $API->delete();
             preg_match_all("/.*?[.?!](?:\s|$)/s", $text, $items);
 
             $n = 1800;
-
-            foreach ($items[0] as $item){
-                if (!isset($page)){
-                    $page = $item;
-                }else{
-                    if(strlen($page . $item) < $n){
-                        $page = $page . $item;
+                foreach ($items[0] as $item){
+                    if (!isset($page)){
+                        $page = $item;
+                    }else{
+                        if(strlen($page . $item) < $n){
+                            $page = $page . $item;
+                        } else {
+                            $length = strlen($page);
+                            $this->createPage(1, $page);
+                            unset($page);
+                            $n = $length + 1;
+                        }
                     }
                 }
 
+            if(isset($page) && strlen($page . $item) < $n) {
+                $this->createPage(1, $page);
+                unset($page);
             }
+
+//            }
+
             echo $page . '<br>';
-//            return $page;
 
-
-//
-//            $quantity = strlen($text);
-//            $page = '';
-//            while ($n != $quantity && $n < $quantity){
-//
-//                $offer = substr($text, $n,1800);
-//
-//                $page = $page . $offer;
-//                $quantity = strlen($page);
-//            };
-//
-//
-//            var_dump($items);
-
-//            dd(implode("<br/>",$split));
-
-
-//            while ($n != $quantity && $n < $quantity){
-//                $page = substr($text, $n,1800);
-//                $n+=1801;
-//                var_dump($page);
-//            };
-//
-//            dd(strlen(''));
-//            dd($docPDF->output());
 
 //            $this->createBook($request->folder_id, $request->name, $docPDF->output(), $request->author);
         }
         if ($this->getExtension($this->filename) == 'docx') {
-            $docText = new DOCXText();
-//            dd($docText->readDocx(storage_path('docs').'/'.$this->filename));
-            $this->createBook($request->folder_id, $request->name, $docText->readDocx(storage_path('docs').'/'.$this->filename), $request->author);
+            $API = new Convertio("4a05d9904fc8070fa1d0e165d00bf3df");           // You can obtain API Key here: https://convertio.co/api/
+            $Text = $API->start(storage_path('docs').'/'.$this->filename, 'txt')->wait()->fetchResultContent()->result_content;
+            $API->delete();
+            echo $Text;
+//            $this->createBook($request->folder_id, $request->name, $docText->readDocx(storage_path('docs').'/'.$this->filename), $request->author);
         }
     }
 
@@ -95,7 +76,7 @@ class UploadController extends Controller
         return explode(".", $filename)[1];
     }
 
-    public function createBook($book_id, $content){
+    public function createPage($book_id, $content){
         $page = new Page();
         $page->book_id = $book_id;
         $page->content = $content;
