@@ -17,7 +17,6 @@ class CreateBooksTable extends Migration
             $table->increments('id');
             $table->integer('folder_id', false, 10)->nullable();
             $table->string('name', 255);
-            $table->text('content');
             $table->string('author', 255);
             $table->integer('likes');
             $table->integer('percent');

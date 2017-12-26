@@ -43,12 +43,14 @@ class BookController extends Controller
     /**
      * Display the specified resource.
      *
-     * @param  int  $id
+     * @param \App\Book $book
+     *
      * @return \Illuminate\Http\Response
+     * @internal param int $id
      */
     public function show(Book $book)
     {
-        $book = Folder::find($book->id);
+        $book = Book::find($book->id);
         return $book;
     }
 

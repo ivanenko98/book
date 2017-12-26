@@ -17,12 +17,29 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
     return $request->user();
 });
 
+Route::group(['middleware' => 'cors'], function () {
 Route::post('/register', 'Auth\RegisterController@register');
 Route::post('/login', 'Auth\LoginController@login');
-
+Route::get('/logout', 'Auth\LoginController@logout');
 Route::post('password/email', 'Auth\ForgotPasswordController@getResetToken');
 Route::post('password/reset', 'Auth\ResetPasswordController@reset');
 Route::post('user/reset-password', 'Auth\ResetPasswordController@userPasswordReset');
+});
+
+Route::group(['middleware' => 'auth:api'], function () {
+
+/** BOOKS */
+/** show books list */
+Route::get('/book', 'BookController@index');
+/** show blocks of book */
+Route::get('/book/{book}', 'BookController@show');
+/** save new book */
+Route::post('/book', 'BookController@store');
+/** update book */
+Route::put('/book/{book}', 'BookController@update');
+/** delete book */
+Route::delete('/book/{book}', 'BookController@destroy');
+
 
 /** FOLDERS */
 /** show folders list */
@@ -37,22 +54,8 @@ Route::put('/folder/{folder}', 'FolderController@update');
 Route::delete('/folder/{folder}', 'FolderController@destroy');
 
 
-/** BOOKS */
-/** show books list */
-Route::get('/book', 'BookController@index');
-/** show blocks of book */
-Route::get('/book/{book}', 'BookController@show');
-/** save new book */
-Route::post('/book', 'BookController@store');
-/** update book */
-Route::put('/book/{book}', 'BookController@update');
-/** delete book */
-Route::delete('/book/{book}', 'BookController@destroy');
-Route::post('password/email', 'Auth\ForgotPasswordController@getResetToken');
-Route::post('password/reset', 'Auth\ResetPasswordController@reset');
-Route::post('user/reset-password', 'Auth\ResetPasswordController@userPasswordReset');
-
-
 /** UPLOAD */
 Route::get('/upload',['as' => 'upload_form', 'uses' => 'UploadController@getForm']);
 Route::post('/upload',['as' => 'upload_file','uses' => 'UploadController@upload']);
+
+});
