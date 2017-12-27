@@ -58,4 +58,8 @@ Route::delete('/folder/{folder}', 'FolderController@destroy');
 Route::get('/upload',['as' => 'upload_form', 'uses' => 'UploadController@getForm']);
 Route::post('/upload',['as' => 'upload_file','uses' => 'UploadController@upload']);
 
+
+/** TRANSLATE */
+Route::post('/get-book',['as' => 'get_book', 'uses' => 'TranslateController@getBook']);
+
 });

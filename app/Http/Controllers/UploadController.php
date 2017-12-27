@@ -8,6 +8,7 @@ use App\Page;
 use Convertio\Convertio;
 use Illuminate\Http\Request;
 use Illuminate\Http\Testing\File;
+use Illuminate\Support\Facades\Auth;
 
 
 class UploadController extends Controller
@@ -28,46 +29,13 @@ class UploadController extends Controller
             }
         }
 
-        if ($this->getExtension($this->filename) == 'pdf') {
-            $API = new Convertio("4a05d9904fc8070fa1d0e165d00bf3df");           // You can obtain API Key here: https://convertio.co/api/
-            $text = $API->start(storage_path('docs').'/'.$this->filename, 'txt')->wait()->fetchResultContent()->result_content;
-            $API->delete();
-            preg_match_all("/.*?[.?!](?:\s|$)/s", $text, $items);
+        $book = $this->createBook($request);
 
-            $n = 1800;
-                foreach ($items[0] as $item){
-                    if (!isset($page)){
-                        $page = $item;
-                    }else{
-                        if(strlen($page . $item) < $n){
-                            $page = $page . $item;
-                        } else {
-                            $length = strlen($page);
-                            $this->createPage(1, $page);
-                            unset($page);
-                            $n = $length + 1;
-                        }
-                    }
-                }
-
-            if(isset($page) && strlen($page . $item) < $n) {
-                $this->createPage(1, $page);
-                unset($page);
-            }
-
-//            }
-
-            echo $page . '<br>';
-
-
-//            $this->createBook($request->folder_id, $request->name, $docPDF->output(), $request->author);
+        if ($this->getExtension($this->filename) == 'pdf' || $this->getExtension($this->filename) == 'docx') {
+            $text = $this->converter();
         }
-        if ($this->getExtension($this->filename) == 'docx') {
-            $API = new Convertio("4a05d9904fc8070fa1d0e165d00bf3df");           // You can obtain API Key here: https://convertio.co/api/
-            $Text = $API->start(storage_path('docs').'/'.$this->filename, 'txt')->wait()->fetchResultContent()->result_content;
-            $API->delete();
-            echo $Text;
-//            $this->createBook($request->folder_id, $request->name, $docText->readDocx(storage_path('docs').'/'.$this->filename), $request->author);
+        if (isset($text)){
+            $this->cutToPages($text, $book);
         }
     }
 
@@ -81,5 +49,55 @@ class UploadController extends Controller
         $page->book_id = $book_id;
         $page->content = $content;
         return $page->save();
+    }
+
+    public function createBook($request){
+        $book = new Book();
+        $book->name = $request->name;
+        $book->author = $request->author;
+        $book->description = $request->description;
+        $book->folder_id = $request->folder_id;
+        $book->user_id = $request->user_id;
+        $book->save();
+        return $book;
+    }
+
+    public function converter(){
+
+        $API = new Convertio("4a05d9904fc8070fa1d0e165d00bf3df");
+        // You can obtain API Key here: https://convertio.co/api/
+        $text = $API->start(storage_path('docs').'/'.$this->filename, 'txt')
+            ->wait()
+            ->fetchResultContent()
+            ->result_content;
+        $API->delete();
+        return $text;
+    }
+
+    public function cutToPages($text, $book){
+        preg_match_all("/.*?[.?!](?:\s|$)/s", $text, $items);
+
+        $n = 1800;
+        foreach ($items[0] as $item){
+            if (!isset($page)){
+                $page = $item;
+            }else{
+                if(strlen($page . $item) < $n){
+                    $page = $page . $item;
+                } else {
+                    $length = strlen($page);
+                    $page_in_db = $this->createPage($book->id, $page);
+                    unset($page);
+                    $n = $length + 1;
+                }
+            }
+        }
+
+        if(isset($page) && strlen($page . $item) < $n) {
+            $page_in_db = $this->createPage($book->id, $page);
+            unset($page);
+        }
+
+        return $page_in_db . '<br>';
     }
 }

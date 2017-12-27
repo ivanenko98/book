@@ -15,16 +15,19 @@ class CreateBooksTable extends Migration
     {
         Schema::create('books', function (Blueprint $table) {
             $table->increments('id');
-            $table->integer('folder_id', false, 10)->nullable();
             $table->string('name', 255);
+            $table->text('description');
             $table->string('author', 255);
-            $table->integer('likes');
-            $table->integer('percent');
+            $table->integer('likes')->default(0);
+            $table->integer('percent')->default(0);
+            $table->integer('folder_id', false, 10)->nullable();
+            $table->integer('user_id', false, 10)->nullable();
             $table->timestamps();
         });
 
         Schema::table('books', function($table) {
             $table->foreign('folder_id')->references('id')->on('folders');
+            $table->foreign('user_id')->references('id')->on('users');
         });
     }
 
