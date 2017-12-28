@@ -85,6 +85,6 @@ class FolderController extends Controller
     public function destroy(Folder $folder)
     {
         $folder->delete();
-        return response()->json(null, 204);
+        return response()->json('deleted', 204);
     }
 }
