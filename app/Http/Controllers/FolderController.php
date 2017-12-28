@@ -87,4 +87,11 @@ class FolderController extends Controller
         $folder->delete();
         return response()->json('deleted', 204);
     }
+
+    public function defaultFolder($user_id){
+        $folder = new Folder();
+        $folder->name = 'Новое';
+        $folder->user_id = $user_id;
+        $folder->save();
+    }
 }

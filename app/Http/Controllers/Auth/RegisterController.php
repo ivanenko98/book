@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Auth;
 
+use App\Http\Controllers\FolderController;
 use App\User;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
@@ -76,6 +77,10 @@ class RegisterController extends Controller
 
     protected function registered(Request $request, $user)
     {
+        $folder = new FolderController();
+
+        $folder->defaultFolder($user->id);
+
         $user->generateToken(true);
         return ['user' => $user];
 //        return response()->json(['data' => $user->toArray()], 201);
