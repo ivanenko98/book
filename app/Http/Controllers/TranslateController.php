@@ -11,7 +11,9 @@ class TranslateController extends Controller
 {
 
     /**
-     * @param Request $request
+     * return one book(full)
+     *
+     * @param Request $request book_id
      * @return \Illuminate\Http\JsonResponse
      */
     public function getBook(Request $request){
@@ -27,9 +29,34 @@ class TranslateController extends Controller
         return response()->json($book_array, 200);
     }
 
-//    public function
 
+    /**
+     * @param Request $request book_id, current_page
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function loadPage(Request $request){
 
+        $all_pages = Page::where([
+            'book_id' => $request->book_id,
+        ])
+            ->get();
+
+        foreach ($all_pages as $item) {
+            $keys_pages[] = $item->id;
+        }
+
+        $pages['prev_page'] = $this->prevPage($keys_pages, $request->book_id, $request->current_page);
+
+        $pages['current_page'] = Page::where([
+                'book_id' => $request->book_id,
+                'id' => $request->current_page
+            ])
+            ->get();
+
+        $pages['next_page'] = $this->nextPage($keys_pages, $request->book_id, $request->current_page);
+
+        return response()->json($pages, 200);
+    }
 
     /**
      * @param $sentence
@@ -55,5 +82,53 @@ class TranslateController extends Controller
             $tok = strtok(" \t\n");
         }
         return $array_words;
+    }
+
+    private function prevPage($keys_pages, $book_id, $current_page){
+
+        if ($keys_pages[0] !== $current_page){
+            if(isset($keys_pages)){
+                foreach ($keys_pages as $key_page) {
+
+                    if($key_page == $current_page){
+                        $id_prev_page = $keys_pages[array_search($key_page, $keys_pages) - 1];
+
+                        $prev_page = Page::where([
+                            'book_id' => $book_id,
+                            'id' => $id_prev_page
+                        ])
+                            ->get();
+
+                        return $prev_page;
+                    }
+                }
+            }
+        }else{
+            return null;
+        }
+    }
+
+    private function nextPage($keys_pages, $book_id, $current_page){
+
+        if (end($keys_pages)!== $current_page){
+            if(isset($keys_pages)){
+                foreach ($keys_pages as $key_page) {
+
+                    if($key_page == $current_page){
+                        $id_next_page = $keys_pages[array_search($key_page, $keys_pages) + 1];
+
+                        $next_page = Page::where([
+                            'book_id' => $book_id,
+                            'id' => $id_next_page
+                        ])
+                            ->get();
+
+                        return $next_page;
+                    }
+                }
+            }
+        }else{
+            return null;
+        }
     }
 }

@@ -61,5 +61,6 @@ Route::post('/upload',['as' => 'upload_file','uses' => 'UploadController@upload'
 
 /** TRANSLATE */
 Route::post('/get-book',['as' => 'get_book', 'uses' => 'TranslateController@getBook']);
+Route::post('/load-page',['as' => 'load_page', 'uses' => 'TranslateController@loadPage']);
 
 });
