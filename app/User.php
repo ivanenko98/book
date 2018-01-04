@@ -55,4 +55,19 @@ class User extends Authenticatable
         return $this->hasMany(Folder::class);
     }
 
+    public function dictionaryEn()
+    {
+        return $this->hasMany('App\DictionaryEN');
+    }
+
+    public function dictionaryUa()
+    {
+        return $this->hasMany('App\DictionaryUA');
+    }
+
+    public function dictionaryEnUa()
+    {
+        return $this->hasMany('App\DictionaryEN_UA');
+    }
+
 }

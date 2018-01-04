@@ -24,9 +24,17 @@ Route::get('/logout', 'Auth\LoginController@logout');
 Route::post('password/email', 'Auth\ForgotPasswordController@getResetToken');
 Route::post('password/reset', 'Auth\ResetPasswordController@reset');
 Route::post('user/reset-password', 'Auth\ResetPasswordController@userPasswordReset');
+
+
+
 });
 
 Route::group(['middleware' => 'auth:api'], function () {
+
+
+    /**Facebook Socialite*/
+    Route::get('login/facebook', 'Auth\LoginController@redirectToProvider');
+    Route::get('login/facebook/callback', 'Auth\LoginController@handleProviderCallback');
 
 /** BOOKS */
 /** show books list */
@@ -61,5 +69,7 @@ Route::post('/upload',['as' => 'upload_file','uses' => 'UploadController@upload'
 
 /** TRANSLATE */
 Route::post('/get-book',['as' => 'get_book', 'uses' => 'TranslateController@getBook']);
+Route::post('/translate',['as' => 'translate', 'uses' => 'TranslateController@translate']);
+
 
 });
