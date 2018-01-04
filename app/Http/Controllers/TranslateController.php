@@ -10,6 +10,7 @@ use Illuminate\Http\Request;
 
 class TranslateController extends Controller
 {
+
     /**
      * return one book(full)
      *
