@@ -103,7 +103,7 @@ class TranslateController extends Controller
 
         $sameWords = array_intersect($relationAllWords, $words);
 
-        dd($sameWords);
+        return $sameWords;
 
 
     }
