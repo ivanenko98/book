@@ -12,15 +12,17 @@ namespace App;
 class Word
 {
     public $name;
-    public $symbol;
+    public $first_symbol;
+    public $last_symbol;
     public $is_translated;
     public $translated_word;
     public $id;
 
-    public function __construct ($name, $symbol = null, $is_translated = false, $translated_word = null)
+    public function __construct ($name, $first_symbol = null, $last_symbol = null, $is_translated = false, $translated_word = null)
     {
         $this->name = $name;
-        $this->symbol = $symbol;
+        $this->first_symbol = $first_symbol;
+        $this->last_symbol = $last_symbol;
         $this->is_translated = $is_translated;
         $this->translated_word = $translated_word;
         $this->id = date("Ymdhis").rand(10000, 99999);

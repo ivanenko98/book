@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class CreateDctEnDctUaTable extends Migration
+class CreateDctEnTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,17 +13,14 @@ class CreateDctEnDctUaTable extends Migration
      */
     public function up()
     {
-        Schema::create('dct-en_dct-ua', function (Blueprint $table) {
+        Schema::create('dcten', function (Blueprint $table) {
             $table->increments('id');
-            $table->text('en-id');
-            $table->text('ua-id');
+            $table->text('word');
             $table->integer('user_id', false, 10)->nullable();
+            $table->foreign('user_id')->references('id')->on('users');
             $table->timestamps();
         });
 
-        Schema::table('dct-en_dct-ua', function($table) {
-            $table->foreign('user_id')->references('id')->on('users');
-        });
     }
 
     /**
@@ -33,6 +30,6 @@ class CreateDctEnDctUaTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('dct-en_dct-ua');
+        Schema::dropIfExists('dct-en');
     }
 }

@@ -6,10 +6,15 @@ use Illuminate\Database\Eloquent\Model;
 
 class DictionaryEN extends Model
 {
-    protected $table = 'dct-en';
+    protected $table = 'dcten';
 
-    public function translate_ua()
+    public function translateUa()
     {
-        return $this->belongsToMany('App\DictionaryUA', 'dct-en_dct-ua', 'en-id', 'ua-id');
+        return $this->belongsToMany('App\DictionaryUA', 'dcten_dctua', 'en_id', 'ua_id');
+    }
+
+    public function User()
+    {
+        return $this->belongsTo('App\User');
     }
 }
