@@ -66,7 +66,7 @@ class LoginController extends Controller
 
         Auth::login($findUser, true);
 
-        return ['message' => 'User login.'];
+        return ['status' => 200];
     }
 
     public function findOrCreateUser($facebookUser){
@@ -86,9 +86,6 @@ class LoginController extends Controller
         }
     }
 
-
-
-
     public function login(Request $request)
     {
         $this->validateLogin($request);
@@ -98,7 +95,7 @@ class LoginController extends Controller
             $user->generateToken(true);
 
             return [
-                'status'=>true,
+                'status'=>200,
                 'user'=>$user
             ];
         }
@@ -118,7 +115,6 @@ class LoginController extends Controller
             $user->save();
         }
 
-        return ['message' => 'User logged out.'];
-//        return Redirect::to('users/login')->with('message', 'Your are now logged out!');
+        return ['status' => 200];
     }
 }
