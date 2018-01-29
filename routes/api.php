@@ -38,6 +38,8 @@ Route::group(['middleware' => 'auth:api'], function () {
     Route::get('/book', 'BookController@index');
     /** show blocks of book */
     Route::get('/book/{book}', 'BookController@show');
+    /** show all genres*/
+    Route::get('/genres', 'BookController@genres');
     /** save new book */
     Route::post('/book', 'BookController@store');
     /** update book */

@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Book;
 use App\Folder;
+use App\Genre;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -17,7 +18,7 @@ class BookController extends Controller
     public function index()
     {
         $user = Auth::user();
-        $book = Folder::where('user_id', $user->id)->get();
+        $book = Book::where('user_id', $user->id)->get();
         return response()->json($book, 200);
     }
 
@@ -91,5 +92,10 @@ class BookController extends Controller
     {
         $book->delete();
         return response()->json('deleted', 200);
+    }
+
+    public function genres(Genre $genre){
+        $allGenres = Genre::all();
+        dd($allGenres);
     }
 }
