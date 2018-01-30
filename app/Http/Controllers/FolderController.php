@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Folder;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class FolderController extends Controller
 {
@@ -14,8 +15,21 @@ class FolderController extends Controller
      */
     public function index()
     {
-        $folder = Folder::all();
-        return response()->json($folder, 201);
+        $user = Auth::user();
+        $folders = Folder::where('user_id', $user->id)->get();
+
+        foreach ($folders as $folder) {
+            $data[] = [
+                'id' => $folder->id,
+                'name' => $folder->name,
+                'user_id' => $folder->user_id,
+                'created_at' => $folder->created_at,
+                'updated_at' => $folder->updated_at,
+                'books' => $folder->books
+            ];
+        }
+
+        return response()->json($data, 200);
     }
 
     /**

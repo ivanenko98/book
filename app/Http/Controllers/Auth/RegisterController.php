@@ -82,7 +82,7 @@ class RegisterController extends Controller
         $folder->defaultFolder($user->id);
 
         $user->generateToken(true);
-        return ['user' => $user];
-//        return response()->json(['data' => $user->toArray()], 201);
+
+        return response()->json($user, 200);
     }
 }

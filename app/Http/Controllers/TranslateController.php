@@ -27,7 +27,7 @@ class TranslateController extends Controller
             }
         }
 //        return response()->json($book_array, 200);
-        return $book_array;
+//        return $book_array;
     }
 
 
@@ -46,17 +46,51 @@ class TranslateController extends Controller
             $keys_pages[] = $item->id;
         }
 
-        $pages['prev_page'] = $this->prevPage($keys_pages, $request->book_id, $request->current_page);
+        $prev_page = $this->prevPage($keys_pages, $request->book_id, $request->current_page);
 
-        $pages['current_page'] = Page::where([
-                'book_id' => $request->book_id,
-                'id' => $request->current_page
-            ])
+        $next_page = $this->nextPage($keys_pages, $request->book_id, $request->current_page);
+
+        $current_page = Page::where([
+            'book_id' => $request->book_id,
+            'id' => $request->current_page
+        ])
             ->get();
 
-        $pages['next_page'] = $this->nextPage($keys_pages, $request->book_id, $request->current_page);
 
-        return response()->json($pages, 200);
+        if ($prev_page != null) {
+            $pages['prev_page'] = $prev_page;
+        }
+
+        if ($current_page != null) {
+            $pages['current_page'] = $current_page;
+        }
+
+        if ($next_page != null) {
+            $pages['next_page'] = $next_page;
+        }
+
+//        dd($pages);
+
+
+        foreach ($pages as $page){
+            foreach ($page as $items){
+                preg_match_all("/.*?[.?!](?:\s|$)/s", $items->content, $items1);
+                foreach ($items1[0] as $item){
+                    $book_array['book']['page'.'-'. $items->id][] = $this->wordToObject($item);
+                }
+            }
+        }
+
+//        dd($book_array);
+
+//        return response()->json($book_array, 200);
+        return $book_array;
+
+
+
+//        dd($pages);
+
+//        return response()->json($pages, 200);
     }
 
     /**
@@ -108,7 +142,9 @@ class TranslateController extends Controller
         $allTranslateWords = DictionaryUA::all();
 
 
-        $book = $this->getBook($request);
+        $book = $this->loadPage($request);
+
+//        dd($book);
 
         foreach ($book['book'] as $bookPages) {
             foreach ($bookPages as $bookWords) {
@@ -127,9 +163,29 @@ class TranslateController extends Controller
             }
         }
 
+//        dd($words);
+//        dd($relationAllWords);
+
         $sameWords = array_intersect($relationAllWords, $words);
 
-        return $sameWords;
+
+
+        foreach ($book['book'] as $bookPages) {
+            foreach ($bookPages as $bookWords) {
+                foreach ($bookWords as $bookWord){
+                    if (in_array($bookWord->name, $sameWords, true) ){
+                        $translatedWord = array_search($bookWord->name, $sameWords);
+                        $bookWord->is_translated = true;
+                        $bookWord->translated_word = $translatedWord;
+                    }
+                }
+            }
+        }
+
+//        dd($book);
+
+        return $book;
+
 
 
     }

@@ -3,7 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Book;
+use App\Folder;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class BookController extends Controller
 {
@@ -14,8 +16,25 @@ class BookController extends Controller
      */
     public function index()
     {
-        $book = Book::all();
-        return response()->json($book, 201);
+        $user = Auth::user();
+        $book = Book::where('user_id', $user->id)->get();
+        return response()->json($book, 200);
+    }
+
+    /**
+     * @param Folder $folder
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function getBooks(Folder $folder)
+    {
+        $user = Auth::user();
+
+        $books = Book::where([
+                    ['folder_id', '=', $folder->id],
+                    ['user_id', '=', $user->id]
+                ])->get();
+
+        return response()->json($books, 200);
     }
 
     /**
@@ -36,8 +55,8 @@ class BookController extends Controller
      */
     public function store(Request $request)
     {
-        $book = Book::create($request->all());
-        return response()->json($book, 201);
+        $book = Book::create($request->except('percent'));
+        return response()->json($book, 200);
     }
 
     /**
@@ -87,6 +106,6 @@ class BookController extends Controller
     public function destroy(Book $book)
     {
         $book->delete();
-        return response()->json('deleted', 204);
+        return response()->json('deleted', 200);
     }
 }

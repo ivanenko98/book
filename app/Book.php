@@ -7,7 +7,9 @@ use Illuminate\Database\Eloquent\Model;
 class Book extends Model
 {
 
-    protected $fillable = ['name', 'description', 'author', 'likes', 'percent', 'folder_id'];
+    protected $fillable = ['name', 'description', 'author', 'likes', 'percent', 'folder_id', 'user_id'];
+
+//    protected $dateFormat = 'd.m.y';
 
     public function folder(){
         return $this->belongsTo(Folder::class);

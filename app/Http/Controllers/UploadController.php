@@ -37,6 +37,8 @@ class UploadController extends Controller
         if (isset($text)){
             $this->cutToPages($text, $book);
         }
+
+        return response()->json($book, 200);
     }
 
     function getExtension ($filename)
