@@ -1,7 +1,6 @@
 <?php
 
 use Illuminate\Http\Request;
-use Illuminate\Http\Response;
 
 /*
 |--------------------------------------------------------------------------
@@ -13,14 +12,6 @@ use Illuminate\Http\Response;
 | is assigned the "api" middleware group. Enjoy building your API!
 |
 */
-
-//Route::options('*', function () {
-//    $response = Response::make('');
-//    $response->header('Access-Control-Allow-Origin', '*');
-//    $response->header('Access-Control-Allow-Methods', 'POST, GET, OPTIONS');
-//    $response->header('Access-Control-Allow-Headers', 'X-Requested-With');
-//    return $response;
-//});
 
 Route::middleware('auth:api')->get('/user', function (Request $request) {
     return $request->user();
@@ -45,6 +36,8 @@ Route::group(['middleware' => 'auth:api'], function () {
     Route::get('/book', 'BookController@index');
     /** show blocks of book */
     Route::get('/book/{book}', 'BookController@show');
+    /** show all genres*/
+    Route::get('/genres', 'BookController@genres');
     /** save new book */
     Route::post('/book', 'BookController@store');
     /** update book */
@@ -52,23 +45,22 @@ Route::group(['middleware' => 'auth:api'], function () {
     /** delete book */
     Route::delete('/book/{book}', 'BookController@destroy');
 
+    /** FOLDERS */
     /** show list books of folder */
     Route::get('/get-books/{folder}', 'BookController@getBooks');
-
-    /** FOLDERS */
-    /** show folders list */
-    Route::get('/folder/', 'FolderController@index');
-    /** show blocks of folder */
-    Route::get('/folder/{folder}', 'FolderController@show');
-    /** save new folder */
-    Route::post('/folder', 'FolderController@store');
-    /** update folder */
-    Route::put('/folder/{folder}', 'FolderController@update');
-    /** delete folder */
-    Route::delete('/folder/{folder}', 'FolderController@destroy');
+/** show folders list */
+Route::get('/folder/', 'FolderController@index');
+/** show blocks of folder */
+Route::get('/folder/{folder}', 'FolderController@show');
+/** save new folder */
+Route::post('/folder', 'FolderController@store');
+/** update folder */
+Route::put('/folder/{folder}', 'FolderController@update');
+/** delete folder */
+Route::delete('/folder/{folder}', 'FolderController@destroy');
 
     /** UPLOAD */
-//        Route::get('/upload',['as' => 'upload_form', 'uses' => 'UploadController@getForm']);
+    Route::get('/upload',['as' => 'upload_form', 'uses' => 'UploadController@getForm']);
     Route::post('/upload',['as' => 'upload_file','uses' => 'UploadController@upload']);
 
     /** TRANSLATE */
