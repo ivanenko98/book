@@ -32,6 +32,7 @@ Route::group(['middleware' => 'auth:api'], function () {
     Route::get('login/facebook/callback', 'Auth\LoginController@handleProviderCallback');
 
     /** BOOKS */
+
     /** show books list */
     Route::get('/book', 'BookController@index');
     /** show blocks of book */
@@ -46,18 +47,19 @@ Route::group(['middleware' => 'auth:api'], function () {
     Route::delete('/book/{book}', 'BookController@destroy');
 
     /** FOLDERS */
+
     /** show list books of folder */
     Route::get('/get-books/{folder}', 'BookController@getBooks');
-/** show folders list */
-Route::get('/folder/', 'FolderController@index');
-/** show blocks of folder */
-Route::get('/folder/{folder}', 'FolderController@show');
-/** save new folder */
-Route::post('/folder', 'FolderController@store');
-/** update folder */
-Route::put('/folder/{folder}', 'FolderController@update');
-/** delete folder */
-Route::delete('/folder/{folder}', 'FolderController@destroy');
+    /** show folders list */
+    Route::get('/folder/', 'FolderController@index');
+    /** show blocks of folder */
+    Route::get('/folder/{folder}', 'FolderController@show');
+    /** save new folder */
+    Route::post('/folder', 'FolderController@store');
+    /** update folder */
+    Route::put('/folder/{folder}', 'FolderController@update');
+    /** delete folder */
+    Route::delete('/folder/{folder}', 'FolderController@destroy');
 
     /** UPLOAD */
     Route::get('/upload',['as' => 'upload_form', 'uses' => 'UploadController@getForm']);
