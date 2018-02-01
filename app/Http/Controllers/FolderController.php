@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Folder;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class FolderController extends Controller
 {
@@ -50,7 +51,7 @@ class FolderController extends Controller
     public function store(Request $request)
     {
         $folder = Folder::create($request->all());
-        return response()->json($folder, 200);
+        return response()->json($folder, 201);
     }
 
     /**
@@ -62,7 +63,7 @@ class FolderController extends Controller
     public function show(Folder $folder)
     {
         $folder = Folder::find($folder->id);
-        return response()->json($folder, 200);
+        return $folder;
     }
 
     /**
@@ -98,7 +99,7 @@ class FolderController extends Controller
     public function destroy(Folder $folder)
     {
         $folder->delete();
-        return response()->json('deleted', 200);
+        return response()->json('deleted', 204);
     }
 
     public function defaultFolder($user_id){

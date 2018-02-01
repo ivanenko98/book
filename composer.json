@@ -6,7 +6,7 @@
     "type": "project",
     "require": {
         "php": ">=7.0.0",
-        "barryvdh/laravel-cors": "^0.10.1",
+        "barryvdh/laravel-cors": "^0.11.0",
         "cloudconvert/cloudconvert-php": "2.2.*",
         "convertio/convertio-php": "^0.4.0",
         "fideloper/proxy": "~3.3",
@@ -37,8 +37,12 @@
     },
     "extra": {
         "laravel": {
-            "dont-discover": [
-            ]
+            "providers": [
+                "Barryvdh\\Debugbar\\ServiceProvider"
+            ],
+            "aliases": {
+                "Debugbar": "Barryvdh\\Debugbar\\Facade"
+            }
         }
     },
     "scripts": {

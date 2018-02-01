@@ -13,8 +13,8 @@ return [
     */
    
     'supportsCredentials' => false,
-    'allowedOrigins' => ['*'],
-    'allowedHeaders' => ['Content-Type', 'X-Requested-With'],
+    'allowedOrigins' => ['http://localhost:3000'],
+    'allowedHeaders' => ['Content-Type', 'X-Requested-With', 'Authorization'],
     'allowedMethods' => ['*'],
     'exposedHeaders' => [],
     'maxAge' => 0,

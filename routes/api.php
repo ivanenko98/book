@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 
 /*
 |--------------------------------------------------------------------------
@@ -12,6 +13,14 @@ use Illuminate\Http\Request;
 | is assigned the "api" middleware group. Enjoy building your API!
 |
 */
+
+//Route::options('*', function () {
+//    $response = Response::make('');
+//    $response->header('Access-Control-Allow-Origin', '*');
+//    $response->header('Access-Control-Allow-Methods', 'POST, GET, OPTIONS');
+//    $response->header('Access-Control-Allow-Headers', 'X-Requested-With');
+//    return $response;
+//});
 
 Route::middleware('auth:api')->get('/user', function (Request $request) {
     return $request->user();
@@ -32,13 +41,10 @@ Route::group(['middleware' => 'auth:api'], function () {
     Route::get('login/facebook/callback', 'Auth\LoginController@handleProviderCallback');
 
     /** BOOKS */
-
     /** show books list */
     Route::get('/book', 'BookController@index');
     /** show blocks of book */
     Route::get('/book/{book}', 'BookController@show');
-    /** show all genres*/
-    Route::get('/genres', 'BookController@genres');
     /** save new book */
     Route::post('/book', 'BookController@store');
     /** update book */
@@ -46,10 +52,10 @@ Route::group(['middleware' => 'auth:api'], function () {
     /** delete book */
     Route::delete('/book/{book}', 'BookController@destroy');
 
-    /** FOLDERS */
-
     /** show list books of folder */
     Route::get('/get-books/{folder}', 'BookController@getBooks');
+
+    /** FOLDERS */
     /** show folders list */
     Route::get('/folder/', 'FolderController@index');
     /** show blocks of folder */
@@ -62,12 +68,12 @@ Route::group(['middleware' => 'auth:api'], function () {
     Route::delete('/folder/{folder}', 'FolderController@destroy');
 
     /** UPLOAD */
-    Route::get('/upload',['as' => 'upload_form', 'uses' => 'UploadController@getForm']);
+//        Route::get('/upload',['as' => 'upload_form', 'uses' => 'UploadController@getForm']);
     Route::post('/upload',['as' => 'upload_file','uses' => 'UploadController@upload']);
 
     /** TRANSLATE */
     Route::post('/get-book',['as' => 'get_book', 'uses' => 'TranslateController@getBook']);
     Route::post('/translate',['as' => 'translate', 'uses' => 'TranslateController@translate']);
     Route::post('/load-page',['as' => 'load_page', 'uses' => 'TranslateController@loadPage']);
-});
 //});
+});
