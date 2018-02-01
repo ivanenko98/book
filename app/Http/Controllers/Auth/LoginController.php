@@ -88,7 +88,7 @@ class LoginController extends Controller
 
     public function login(Request $request)
     {
-        $this->validateLogin($request);
+        $this->validateByPhone($request);
 
         if ($this->attemptLogin($request)) {
             $user = $this->guard()->user();
@@ -98,12 +98,13 @@ class LoginController extends Controller
                 'status'=>200,
                 'user'=>$user
             ];
+        } else {
+            return [
+                'status'=>false,
+                'msg' => $this->sendFailedPhoneLoginResponse($request)
+            ];
         }
 
-        return [
-            'status'=>false,
-            'msg' => $this->sendFailedLoginResponse($request)
-        ];
     }
 
     public function logout(Request $request)
