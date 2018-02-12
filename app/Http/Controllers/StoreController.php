@@ -8,7 +8,6 @@ use App\PurchasedBook;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
-
 class StoreController extends Controller
 {
     public $number = 10;
