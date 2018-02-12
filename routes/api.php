@@ -14,19 +14,10 @@ use Illuminate\Http\Response;
 |
 */
 
-//Route::options('*', function () {
-//    $response = Response::make('');
-//    $response->header('Access-Control-Allow-Origin', '*');
-//    $response->header('Access-Control-Allow-Methods', 'POST, GET, OPTIONS');
-//    $response->header('Access-Control-Allow-Headers', 'X-Requested-With');
-//    return $response;
-//});
-
 Route::middleware('auth:api')->get('/user', function (Request $request) {
     return $request->user();
 });
 
-//Route::group(['middleware' => 'cors'], function () {
 Route::post('/register', 'Auth\RegisterController@register');
 Route::post('/login', 'Auth\LoginController@login');
 Route::get('/logout', 'Auth\LoginController@logout');
@@ -36,7 +27,18 @@ Route::post('user/reset-password', 'Auth\ResetPasswordController@userPasswordRes
 
 Route::group(['middleware' => 'auth:api'], function () {
 
-    /**Facebook Socialite*/
+    /** USER */
+    /** get purchased books */
+    Route::get('/purchased-books', 'StoreController@getPurchasedBooks');
+    /** get sold books */
+    Route::get('/sold-books', 'StoreController@getSoldBooks');
+    /** archive book */
+    Route::post('/archive-book', 'StoreController@archivingBook');
+    /** restore book */
+    Route::post('/restore-book', 'StoreController@restoreBook');
+
+
+    /** FACEBOOK SOCIALITE */
     Route::get('login/facebook', 'Auth\LoginController@redirectToProvider');
     Route::get('login/facebook/callback', 'Auth\LoginController@handleProviderCallback');
 
@@ -50,10 +52,10 @@ Route::group(['middleware' => 'auth:api'], function () {
     /** update book */
     Route::put('/book/{book}', 'BookController@update');
     /** delete book */
-    Route::delete('/book/{book}', 'BookController@destroy');
-
+    Route::post('/book-delete', 'BookController@destroy');
     /** show list books of folder */
     Route::get('/get-books/{folder}', 'BookController@getBooks');
+
 
     /** FOLDERS */
     /** show folders list */
@@ -67,13 +69,27 @@ Route::group(['middleware' => 'auth:api'], function () {
     /** delete folder */
     Route::delete('/folder/{folder}', 'FolderController@destroy');
 
+
     /** UPLOAD */
-//        Route::get('/upload',['as' => 'upload_form', 'uses' => 'UploadController@getForm']);
     Route::post('/upload',['as' => 'upload_file','uses' => 'UploadController@upload']);
+
 
     /** TRANSLATE */
     Route::post('/get-book',['as' => 'get_book', 'uses' => 'TranslateController@getBook']);
     Route::post('/translate',['as' => 'translate', 'uses' => 'TranslateController@translate']);
     Route::post('/load-page',['as' => 'load_page', 'uses' => 'TranslateController@loadPage']);
-//});
+
+
+    /** STORE */
+    /** get popular books */
+    Route::get('/get-popular-books', 'StoreController@getPopularBooks');
+    /** get new books */
+    Route::get('/get-new-books', 'StoreController@getNewBooks');
+    /** get new books */
+    Route::get('/get-recommended-books', 'StoreController@getRecommendedBooks');
+    /** list genres */
+    Route::get('/list-genres', 'StoreController@getListGenres');
+    /** buy book */
+    Route::post('/buy-book', 'StoreController@buyBook');
+
 });

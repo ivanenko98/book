@@ -70,4 +70,13 @@ class User extends Authenticatable
         return $this->hasMany('App\DictionaryEN_UA');
     }
 
+    public function purchasedBooks()
+    {
+        return $this->hasMany('App\PurchasedBook', 'buyer_id');
+    }
+
+    public function soldBooks()
+    {
+        return $this->hasMany('App\PurchasedBook', 'seller_id');
+    }
 }

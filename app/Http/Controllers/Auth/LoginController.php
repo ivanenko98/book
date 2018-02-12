@@ -3,8 +3,9 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
+use App\Traits\PhoneAuth;
 use App\User;
-use Illuminate\Foundation\Auth\AuthenticatesUsers;
+//use Illuminate\Foundation\Auth\AuthenticatesUsers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Laravel\Socialite\Facades\Socialite;
@@ -22,8 +23,8 @@ class LoginController extends Controller
     | to conveniently provide its functionality to your applications.
     |
     */
-
-    use AuthenticatesUsers;
+    
+    use PhoneAuth;
 
     /**
      * Where to redirect users after login.
@@ -91,22 +92,22 @@ class LoginController extends Controller
 
     public function login(Request $request)
     {
-        $this->validateLogin($request);
+        $this->validateByPhone($request);
 
         if ($this->attemptLogin($request)) {
             $user = $this->guard()->user();
             $user->generateToken(true);
 
             return [
-                'status'=>true,
+                'status'=>200,
                 'user'=>$user
             ];
+        } else {
+            return [
+                'status'=>false,
+                'msg' => $this->sendFailedPhoneLoginResponse($request)
+            ];
         }
-
-        return [
-            'status'=>false,
-            'msg' => $this->sendFailedLoginResponse($request)
-        ];
     }
 
     public function logout(Request $request)
