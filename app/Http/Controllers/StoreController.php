@@ -174,7 +174,6 @@ class StoreController extends Controller
     public function getListGenres()
     {
         $genres = Genre::all();
-
         return $this->formatResponse('success', null, $genres);
     }
 }
