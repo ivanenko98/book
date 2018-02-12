@@ -3,13 +3,16 @@
 namespace App\Http\Controllers;
 
 use App\Book;
-//use App\Http\Requests\UploadRequest;
+use App\Http\Requests\UploadRequest;
 use App\Page;
+use Convertio\Convertio;
+use Convertio\Exceptions\APIException;
+use Convertio\Exceptions\CURLException;
 use Illuminate\Http\Request;
 use Illuminate\Http\Testing\File;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
-
+use Smalot\PdfParser\Parser;
 
 
 class UploadController extends Controller

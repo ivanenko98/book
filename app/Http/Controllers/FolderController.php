@@ -64,7 +64,7 @@ class FolderController extends Controller
     public function show(Folder $folder)
     {
         $folder = Folder::find($folder->id);
-        return $folder;
+        return response()->json($folder, 200);
     }
 
     /**
@@ -88,8 +88,7 @@ class FolderController extends Controller
     public function update(Request $request, Folder $folder)
     {
         $folder->update($request->all());
-        return response()->json();
-
+        return response()->json($folder, 200);
     }
 
     /**
@@ -100,13 +99,13 @@ class FolderController extends Controller
      */
     public function destroy(Folder $folder)
     {
+        $folder->books()->delete();
         foreach ($folder->books as $book){
             $book->pages()->delete();
         }
         $folder->books()->delete();
         $folder->delete();
-//        dd('delete');
-//        return response()->json(, 200);
+
         return response()->json([
             'msg' => 'Deleted'
         ], 200);

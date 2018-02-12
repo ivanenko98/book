@@ -47,12 +47,16 @@ Route::group(['middleware' => 'auth:api'], function () {
     Route::get('/book', 'BookController@index');
     /** show blocks of book */
     Route::get('/book/{book}', 'BookController@show');
+    /** show all genres*/
+    Route::get('/genres', 'BookController@genres');
     /** save new book */
     Route::post('/book', 'BookController@store');
     /** update book */
     Route::put('/book/{book}', 'BookController@update');
     /** delete book */
     Route::post('/book-delete', 'BookController@destroy');
+    /** change folder of book*/
+    Route::post('/book-folder', 'BookController@updateFolder');
     /** show list books of folder */
     Route::get('/get-books/{folder}', 'BookController@getBooks');
 
@@ -80,6 +84,17 @@ Route::group(['middleware' => 'auth:api'], function () {
     Route::post('/load-page',['as' => 'load_page', 'uses' => 'TranslateController@loadPage']);
 
 
+    /** REVIEWS */
+    /** show reviews list */
+    Route::get('/review/', 'ReviewController@index');
+   /** save new folder */
+    Route::post('/review', 'ReviewController@store');
+    /** update folder */
+    Route::put('/review/{review}', 'ReviewController@update');
+    /** delete folder */
+    Route::delete('/review/{review}', 'ReviewController@destroy');
+
+
     /** STORE */
     /** get popular books */
     Route::get('/get-popular-books', 'StoreController@getPopularBooks');
@@ -91,5 +106,4 @@ Route::group(['middleware' => 'auth:api'], function () {
     Route::get('/list-genres', 'StoreController@getListGenres');
     /** buy book */
     Route::post('/buy-book', 'StoreController@buyBook');
-
 });
