@@ -13,13 +13,15 @@ class FolderController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
+    public $data;
+
     public function index()
     {
         $user = Auth::user();
         $folders = Folder::where('user_id', $user->id)->get();
 
         foreach ($folders as $folder) {
-            $data[] = [
+            $this->data[] = [
                 'id' => $folder->id,
                 'name' => $folder->name,
                 'user_id' => $folder->user_id,
@@ -29,7 +31,7 @@ class FolderController extends Controller
             ];
         }
 
-        return response()->json($data, 200);
+        return response()->json($this->data, 200);
     }
 
     /**
@@ -87,7 +89,8 @@ class FolderController extends Controller
     public function update(Request $request, Folder $folder)
     {
         $folder->update($request->all());
-        return response()->json($folder, 200);
+        return response()->json();
+
     }
 
     /**
@@ -98,8 +101,16 @@ class FolderController extends Controller
      */
     public function destroy(Folder $folder)
     {
+        foreach ($folder->books as $book){
+            $book->pages()->delete();
+        }
+        $folder->books()->delete();
         $folder->delete();
-        return response()->json('deleted', 204);
+//        dd('delete');
+//        return response()->json(, 200);
+        return response()->json([
+            'msg' => 'Deleted'
+        ], 200);
     }
 
     public function defaultFolder($user_id){

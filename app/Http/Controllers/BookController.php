@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Book;
 use App\Folder;
+use App\Page;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -103,9 +104,31 @@ class BookController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy(Book $book)
+    public function destroy(Request $request, Book $book, Page $page)
     {
-        $book->delete();
-        return response()->json('deleted', 200);
+//        $ids = $request->all();
+//        foreach ($ids as $id) {
+//            $pages = $book->pages->where('book_id', $id);
+//            foreach ($pages as $page) {
+//                if($page != null) {
+//                    $page->delete();
+//                }
+//            }
+//            $book->where('id', $id)->delete();
+//        }
+        $ids = $request->all();
+        foreach ($ids as $id) {
+
+            $check = $book->where('user_id', Auth::user()->id);
+
+            if ($check == true) {
+                $page->where('book_id', $id)->delete();
+            } else {
+                dd('error');
+            }
+
+            $book->where('id', $id)->delete();
+        }
+        return response()->json(['success'=>"Books deleted successfully."]);
     }
 }

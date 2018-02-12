@@ -24,6 +24,7 @@ if (isset($_SERVER['HTTP_ORIGIN'])) {
  * @author   Taylor Otwell <taylor@laravel.com>
  */
 
+
 define('LARAVEL_START', microtime(true));
 
 /*

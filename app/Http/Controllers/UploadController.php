@@ -3,37 +3,54 @@
 namespace App\Http\Controllers;
 
 use App\Book;
-use App\Http\Requests\UploadRequest;
+//use App\Http\Requests\UploadRequest;
 use App\Page;
-use Convertio\Convertio;
 use Illuminate\Http\Request;
 use Illuminate\Http\Testing\File;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
+
 
 
 class UploadController extends Controller
 {
     public $filename;
 
-    public function getForm()
-    {
-        return view('upload.upload-form');
-    }
+    public $path;
+
+    public $page_in_db;
 
     public function upload(Request $request)
     {
-        foreach ($request->file() as $files) {
-            foreach ($files as $file) {
-                $file->move(storage_path('docs'), time() . '_' . $file->getClientOriginalName());
-                $this->filename = time() . '_' . $file->getClientOriginalName();
-            }
+
+//        ini_set('max_execution_time', 0);
+
+        if ($request->hasFile('file')) {
+            $request->file('file')->store('docs');
+        } else {
+            return response()->json([
+                'status' => false,
+                'msg' => 'Error'
+            ]);
         }
+
+        $this->filename = $request->file->hashName();
+
+        $this->path = Storage::path('docs').'/'.$this->filename;
 
         $book = $this->createBook($request);
 
-        if ($this->getExtension($this->filename) == 'pdf' || $this->getExtension($this->filename) == 'docx') {
-            $text = $this->converter();
+//        dd($book);
+
+        switch ($this->getExtension($this->filename)) {
+            case "pdf":
+                $text = $this->pdfToTxt();
+                break;
+            case "docx":
+                $text = $this->docxToTxt();
+                break;
         }
+
         if (isset($text)){
             $this->cutToPages($text, $book);
         }
@@ -43,7 +60,10 @@ class UploadController extends Controller
 
     function getExtension ($filename)
     {
-        return explode(".", $filename)[1];
+//        return explode(".", $filename)[1];
+        $filename = substr($filename, strpos($filename, ".") + 1);
+//        dd($filename);
+        return $filename;
     }
 
     public function createPage($book_id, $content){
@@ -64,16 +84,40 @@ class UploadController extends Controller
         return $book;
     }
 
-    public function converter(){
+    public function pdfToTxt(){
+        $reader = new \Asika\Pdf2text;
+        dd($this->path);
+        $text = $reader->decode($this->path);
+        dd($text);
+    }
 
-        $API = new Convertio("4a05d9904fc8070fa1d0e165d00bf3df");
-        // You can obtain API Key here: https://convertio.co/api/
-        $text = $API->start(storage_path('docs').'/'.$this->filename, 'txt')
-            ->wait()
-            ->fetchResultContent()
-            ->result_content;
-        $API->delete();
-        return $text;
+
+    private function docxToTxt(){
+
+        $content = '';
+
+        $zip = zip_open($this->path);
+
+        if (!$zip || is_numeric($zip)) return false;
+
+        while ($zip_entry = zip_read($zip)) {
+
+            if (zip_entry_open($zip, $zip_entry) == FALSE) continue;
+
+            if (zip_entry_name($zip_entry) != "word/document.xml") continue;
+
+            $content .= zip_entry_read($zip_entry, zip_entry_filesize($zip_entry));
+
+            zip_entry_close($zip_entry);
+        }// end while
+
+        zip_close($zip);
+
+        $content = str_replace('</w:r></w:p></w:tc><w:tc>', " ", $content);
+        $content = str_replace('</w:r></w:p>', "\r\n", $content);
+        $striped_content = strip_tags($content);
+
+        return $striped_content;
     }
 
     public function cutToPages($text, $book){
@@ -88,7 +132,7 @@ class UploadController extends Controller
                     $page = $page . $item;
                 } else {
                     $length = strlen($page);
-                    $page_in_db = $this->createPage($book->id, $page);
+                    $this->page_in_db = $this->createPage($book->id, $page);
                     unset($page);
                     $n = $length + 1;
                 }
@@ -96,10 +140,10 @@ class UploadController extends Controller
         }
 
         if(isset($page) && strlen($page . $item) < $n) {
-            $page_in_db = $this->createPage($book->id, $page);
+            $this->page_in_db = $this->createPage($book->id, $page);
             unset($page);
         }
 
-        return $page_in_db . '<br>';
+        return $this->page_in_db . '<br>';
     }
 }

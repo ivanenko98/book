@@ -6,6 +6,7 @@
     "type": "project",
     "require": {
         "php": ">=7.0.0",
+        "asika/pdf2text": "1.*",
         "barryvdh/laravel-cors": "^0.11.0",
         "cloudconvert/cloudconvert-php": "2.2.*",
         "convertio/convertio-php": "^0.4.0",
@@ -13,6 +14,7 @@
         "laravel/framework": "5.5.*",
         "laravel/socialite": "^3.0",
         "laravel/tinker": "~1.0",
+        "robbiep/cloudconvert-laravel": "2.*",
         "tymon/jwt-auth": "^0.5.12"
     },
     "require-dev": {

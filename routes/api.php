@@ -50,7 +50,7 @@ Route::group(['middleware' => 'auth:api'], function () {
     /** update book */
     Route::put('/book/{book}', 'BookController@update');
     /** delete book */
-    Route::delete('/book/{book}', 'BookController@destroy');
+    Route::post('/book-delete', 'BookController@destroy');
 
     /** show list books of folder */
     Route::get('/get-books/{folder}', 'BookController@getBooks');
