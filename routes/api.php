@@ -45,7 +45,11 @@ Route::group(['middleware' => 'auth:api'], function () {
     /** update book */
     Route::put('/book/{book}', 'BookController@update');
     /** delete book */
-    Route::delete('/book/{book}', 'BookController@destroy');
+    Route::post('/book-delete', 'BookController@destroy');
+    /** change folder of book*/
+    Route::post('/book-folder', 'BookController@updateFolder');
+
+
 
     /** FOLDERS */
     /** show folders list */
@@ -67,5 +71,22 @@ Route::group(['middleware' => 'auth:api'], function () {
     Route::post('/get-book',['as' => 'get_book', 'uses' => 'TranslateController@getBook']);
     Route::post('/translate',['as' => 'translate', 'uses' => 'TranslateController@translate']);
     Route::post('/load-page',['as' => 'load_page', 'uses' => 'TranslateController@loadPage']);
+
+    /** STORE */
+    Route::get('/store', 'StoreController@index');
+
+    /** REVIEWS */
+    /** show reviews list */
+    Route::get('/review/', 'ReviewController@index');
+//    /** show blocks of folder */
+//    Route::get('/review/{review}', 'FolderController@show');
+    /** save new folder */
+    Route::post('/review', 'ReviewController@store');
+    /** update folder */
+    Route::put('/review/{review}', 'ReviewController@update');
+    /** delete folder */
+    Route::delete('/review/{review}', 'ReviewController@destroy');
+
 });
+
 //});

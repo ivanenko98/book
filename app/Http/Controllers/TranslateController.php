@@ -10,6 +10,16 @@ use Illuminate\Http\Request;
 
 class TranslateController extends Controller
 {
+
+    public $words;
+
+    public $keys_pages;
+
+    public $relationAllWords;
+
+    public $pages;
+
+    public $book_array;
     /**
      * return one book(full)
      *
@@ -37,18 +47,13 @@ class TranslateController extends Controller
      */
     public function loadPage(Request $request){
 
-        $all_pages = Page::where([
-            'book_id' => $request->book_id,
-        ])
-            ->get();
+        $allPages = $this->allPages($request);
 
-        foreach ($all_pages as $item) {
-            $keys_pages[] = $item->id;
-        }
+        $keysPages = $this->keysPages($allPages);
 
-        $prev_page = $this->prevPage($keys_pages, $request->book_id, $request->current_page);
+        $prev_page = $this->prevPage($keysPages, $request->book_id, $request->current_page);
 
-        $next_page = $this->nextPage($keys_pages, $request->book_id, $request->current_page);
+        $next_page = $this->nextPage($keysPages, $request->book_id, $request->current_page);
 
         $current_page = Page::where([
             'book_id' => $request->book_id,
@@ -69,28 +74,38 @@ class TranslateController extends Controller
             $pages['next_page'] = $next_page;
         }
 
-//        dd($pages);
+        $bookArray = $this->bookArray($this->pages);
+
+        return response()->json($bookArray, 200);
+    }
+
+    private function allPages(Request $request){
+        $all_pages = Page::where([
+            'book_id' => $request->book_id,
+        ])
+            ->get();
+        return $all_pages;
+    }
 
 
+    private function bookArray($pages){
         foreach ($pages as $page){
             foreach ($page as $items){
                 preg_match_all("/.*?[.?!](?:\s|$)/s", $items->content, $items1);
                 foreach ($items1[0] as $item){
-                    $book_array['book']['page'.'-'. $items->id][] = $this->wordToObject($item);
+                    $this->book_array['book']['page'.'-'. $items->id][] = $this->wordToObject($item);
                 }
             }
         }
+        return $this->book_array;
+    }
 
-//        dd($book_array);
-
-//        return response()->json($book_array, 200);
-        return $book_array;
-
-
-
-//        dd($pages);
-
-//        return response()->json($pages, 200);
+    private function keysPages($allPages){
+        foreach ($allPages as $item) {
+            dd($item);
+            $this->keys_pages[] = $item->id;
+        }
+        return $this->keys_pages;
     }
 
     /**
@@ -166,7 +181,7 @@ class TranslateController extends Controller
 //        dd($words);
 //        dd($relationAllWords);
 
-        $sameWords = array_intersect($relationAllWords, $words);
+        $sameWords = array_intersect($this->relationAllWords, $this->words);
 
 
 
