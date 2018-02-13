@@ -95,19 +95,23 @@ class UploadController extends Controller
     }
 
     public function pdfToTxt(){
+
+        $API = new Convertio("4a05d9904fc8070fa1d0e165d00bf3df");           // You can obtain API Key here: https://convertio.co/api/
+        $text = $API->start($this->path, 'txt')->wait()->fetchResultContent()->result_content;
+        $API->delete();
 //        $reader = new \Asika\Pdf2text;
 //        $text = $reader->decode($this->path);
 //
 
         // Create an instance of the PDFParser
-        $PDFParser = new Parser();
+//        $PDFParser = new Parser();
 
         // Create an instance of the PDF with the parseFile method of the parser
         // this method expects as first argument the path to the PDF file
-        $pdf = $PDFParser->parseFile($this->path);
+//        $pdf = $PDFParser->parseFile($this->path);
 
         // Extract ALL text with the getText method
-        $text = $pdf->getText();
+//        $text = $pdf->getText();
 
 //        dd($text);
         return $text;
