@@ -26,8 +26,6 @@ class UploadController extends Controller
     public function upload(Request $request)
     {
 
-//        ini_set('max_execution_time', 0);
-
         if ($request->hasFile('file')) {
             $request->file('file')->store('docs');
         } else {
@@ -42,8 +40,6 @@ class UploadController extends Controller
         $this->path = Storage::path('docs').'/'.$this->filename;
 
         $book = $this->createBook($request);
-
-//        dd($book);
 
         switch ($this->getExtension($this->filename)) {
             case "pdf":
@@ -63,9 +59,7 @@ class UploadController extends Controller
 
     function getExtension ($filename)
     {
-//        return explode(".", $filename)[1];
         $filename = substr($filename, strpos($filename, ".") + 1);
-//        dd($filename);
         return $filename;
     }
 
@@ -88,10 +82,28 @@ class UploadController extends Controller
     }
 
     public function pdfToTxt(){
-        $reader = new \Asika\Pdf2text;
-        dd($this->path);
-        $text = $reader->decode($this->path);
-        dd($text);
+
+        if (filesize($this->path) <= 1500000){
+            return $this->parseSmallPdfFiles($this->path);
+        }
+        return $this->parseBigPdfFiles($this->path);
+    }
+
+    public function parseBigPdfFiles($path){
+        $API = new Convertio("4a05d9904fc8070fa1d0e165d00bf3df");           // You can obtain API Key here: https://convertio.co/api/
+        $text = $API->start($path, 'txt')->wait()->fetchResultContent()->result_content;
+        $API->delete();
+        return $text;
+    }
+
+    public function parseSmallPdfFiles($path){
+        $PDFParser = new Parser();
+
+        $pdf = $PDFParser->parseFile($path);
+
+        $text = $pdf->getText();
+
+        return $text;
     }
 
 
