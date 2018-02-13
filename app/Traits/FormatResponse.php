@@ -10,6 +10,7 @@ namespace App\Http\Traits;
  */
 trait FormatResponse
 {
+
     protected function formatResponse($status, $message = null, $data = null){
         return [
             'status' => $status,
@@ -17,4 +18,5 @@ trait FormatResponse
             'message' => $message,
         ];
     }
+
 }
