@@ -8,6 +8,7 @@ class Review extends Model
 {
     protected $fillable = ['rating', 'content', 'author', 'book_id', 'user_id'];
 
+
     public function book(){
         return $this->belongsTo(Book::class);
     }
