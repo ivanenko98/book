@@ -36,9 +36,7 @@ class UploadController extends Controller
         }
 
         $this->filename = $request->file->hashName();
-
         $this->path = Storage::path('docs').'/'.$this->filename;
-
         $book = $this->createBook($request);
 
         switch ($this->getExtension($this->filename)) {
