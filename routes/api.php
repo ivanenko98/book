@@ -60,6 +60,13 @@ Route::group(['middleware' => 'auth:api'], function () {
     /** show list books of folder */
     Route::get('/get-books/{folder}', 'BookController@getBooks');
 
+    /**
+     * search books
+     *
+     * parameters: keyword
+     */
+    Route::post('/search-books', 'BookController@searchBooks');
+
 
     /** FOLDERS */
     /** show folders list */

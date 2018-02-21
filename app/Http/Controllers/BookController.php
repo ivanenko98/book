@@ -131,4 +131,17 @@ class BookController extends Controller
         return response()->json(['success'=>"Products Deleted successfully."]);
 
     }
+
+    public function searchBooks(Request $request)
+    {
+        $keyword = $request->keyword;
+
+        $books = Book::where(function ($q) use ($keyword) {
+            $q->where('name', 'like', "%{$keyword}%")
+                ->orWhere('author', 'like', "%{$keyword}%");
+        })->orderBy('id', 'desc')->get();
+
+        $response = $this->arrayResponse('success', null, $books);
+        return response($response, 200);
+    }
 }
