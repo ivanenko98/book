@@ -144,4 +144,16 @@ class BookController extends Controller
         $response = $this->arrayResponse('success', null, $books);
         return response($response, 200);
     }
+
+    /** Need for mobile app
+     * @param Request $request
+     * @return \Illuminate\Contracts\Routing\ResponseFactory|\Symfony\Component\HttpFoundation\Response
+     */
+    public function listBooks(Request $request)
+    {
+        $books = Book::where('genre_id', $request->genre_id)->get();
+
+        $response = $this->arrayResponse('success', null, $books);
+        return response($response, 200);
+    }
 }

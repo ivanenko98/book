@@ -67,6 +67,13 @@ Route::group(['middleware' => 'auth:api'], function () {
      */
     Route::post('/search-books', 'BookController@searchBooks');
 
+    /**
+     * list books
+     *
+     * parameters: genre_id
+     */
+    Route::post('/list-books', 'BookController@listBooks');
+
 
     /** FOLDERS */
     /** show folders list */
