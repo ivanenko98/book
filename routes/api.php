@@ -74,6 +74,19 @@ Route::group(['middleware' => 'auth:api'], function () {
      */
     Route::post('/list-books', 'BookController@listBooks');
 
+    /**
+     * upload image book
+     *
+     * parameters: file
+     */
+    Route::post('/image-book', 'BookController@uploadImage');
+
+    /**
+     * get image book
+     *
+     */
+    Route::get('/get-image-book', 'BookController@getImage');
+
 
     /** FOLDERS */
     /** show folders list */

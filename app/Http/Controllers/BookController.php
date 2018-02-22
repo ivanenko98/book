@@ -5,10 +5,12 @@ namespace App\Http\Controllers;
 use App\Book;
 use App\Folder;
 use App\Genre;
+use App\Http\Requests\ImageRequest;
 use App\Page;
 use App\Review;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
 
 class BookController extends Controller
 {
@@ -25,21 +27,8 @@ class BookController extends Controller
     {
         $user = Auth::user();
         $books = Book::where('user_id', $user->id)->get();
-        foreach ($books as $book) {
-            $this->data[] = [
-                'id' => $book->id,
-                'name' => $book->name,
-                'description' => $book->description,
-                'author' => $book->author,
-                'likes' => $book->likes,
-                'folder_id' => $book->folder_id,
-                'user_id' => $book->user_id,
-                'genre_id' => $book->genre_id,
-                'created_at' => $book->created_at,
-                'reviews' => Review::where('book_id', $book->id)->get(),
-            ];
-        }
-        return response()->json($this->data, 200);
+
+        return response()->json($books, 200);
     }
 
     /**
@@ -154,6 +143,30 @@ class BookController extends Controller
         $books = Book::where('genre_id', $request->genre_id)->get();
 
         $response = $this->arrayResponse('success', null, $books);
+        return response($response, 200);
+    }
+
+    public function uploadImage(ImageRequest $request)
+    {
+        $book = Book::find($request->book_id);
+
+        if ($book == null) {
+            $response = $this->arrayResponse('error', 'book not found');
+            return response($response, 200);
+        }
+
+        if ($book->image !== null) {
+            Storage::disk('local')->delete('images/' . $book->image);
+        }
+
+        $imageName = time().'.'.request()->image->getClientOriginalExtension();
+
+        Storage::disk('local')->putFileAs('images', $request->image, $imageName);
+
+        $book->image = $imageName;
+        $book->save();
+
+        $response = $this->arrayResponse('success', null);
         return response($response, 200);
     }
 }
