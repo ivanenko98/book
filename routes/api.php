@@ -82,11 +82,11 @@ Route::group(['middleware' => 'auth:api'], function () {
     Route::post('/image-book', 'BookController@uploadImage');
 
     /**
-     * get image book
+     * upload image user
      *
+     * parameters: file
      */
-    Route::get('/get-image-book', 'BookController@getImage');
-
+    Route::post('/image-user', 'UserController@uploadImage');
 
     /** FOLDERS */
     /** show folders list */
@@ -112,8 +112,8 @@ Route::group(['middleware' => 'auth:api'], function () {
 
 
     /** REVIEWS */
-    /** show reviews list */
-    Route::get('/review/', 'ReviewController@index');
+    /** show reviews list for book */
+    Route::post('/list-reviews/', 'ReviewController@index');
    /** save new folder */
     Route::post('/review', 'ReviewController@store');
     /** update folder */

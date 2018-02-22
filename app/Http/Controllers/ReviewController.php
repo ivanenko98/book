@@ -9,6 +9,18 @@ use Illuminate\Support\Facades\Validator;
 
 class ReviewController extends Controller
 {
+
+    public function index(Request $request)
+    {
+        $reviews = Review::where([
+            ['book_id', $request->book_id],
+            ['content', '!=', ['', null]],
+        ])->get();
+
+        $response = $this->arrayResponse('success', null, $reviews);
+        return response($response, 200);
+    }
+
     /**
      * Store a newly created resource in storage.
      *
@@ -28,7 +40,6 @@ class ReviewController extends Controller
 
         $validator = Validator::make($data,[
             'rating' => 'integer|required|max:5|min:0',
-            'author' => 'required',
             'book_id' => 'integer|required',
         ]);
 

@@ -16,13 +16,14 @@ class Book extends Model
         'percent',
         'folder_id',
         'user_id',
+        'image',
         'created_at',
         'updated_at',
         'genre_name',
         'pages',
         'reviews',
         'genre',
-        'translator'
+        'translator',
     ];
 
     protected $appends = [
