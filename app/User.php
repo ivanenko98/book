@@ -28,6 +28,10 @@ class User extends Authenticatable
         'password', 'remember_token',
     ];
 
+    protected $appends = [
+        'rating'
+    ];
+
     public function sendLinkToReset($token, $user)
     {
         $letter['from'] = 'book@gmail.com';
@@ -80,8 +84,33 @@ class User extends Authenticatable
         return $this->hasMany('App\PurchasedBook', 'seller_id');
     }
 
-    public function reviews(){
+    public function reviews()
+    {
         return $this->hasMany(Review::class);
+    }
+
+
+    public function getRatingAttribute()
+    {
+//        dd($this->soldBooks);
+        $rating = 0;
+        foreach ($this->soldBooks as $soldBook) {
+
+            foreach ($soldBook->book->reviews as $review) {
+                $rating = (int)$rating + (int)$review->rating;
+//               dd($rating);
+            }
+        }
+
+//        dd($this->soldBooks);
+
+        return $rating;
+
+//        if ($rating == 0) {
+//            return null;
+//        } else {
+//            return $rating;
+//        }
     }
 
 }

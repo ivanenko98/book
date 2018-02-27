@@ -37,7 +37,6 @@ Route::group(['middleware' => 'auth:api'], function () {
     /** restore book */
     Route::post('/restore-book', 'StoreController@restoreBook');
 
-
     /** FACEBOOK SOCIALITE */
     Route::get('login/facebook', 'Auth\LoginController@redirectToProvider');
     Route::get('login/facebook/callback', 'Auth\LoginController@handleProviderCallback');

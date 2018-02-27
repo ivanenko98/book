@@ -34,10 +34,4 @@ class UserController extends Controller
         return response($response, 200);
     }
 
-    public function rating(Request $request)
-    {
-        $user = Auth::user();
-
-//        $books = $user->
-    }
 }

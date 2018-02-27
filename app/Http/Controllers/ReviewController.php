@@ -53,21 +53,10 @@ class ReviewController extends Controller
     }
 
     /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function edit($id)
-    {
-
-    }
-
-    /**
      * Update the specified resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
+     * @param  \Illuminate\Http\Request $request
+     * @param Review $review
      * @return \Illuminate\Http\Response
      */
     public function update(Request $request, Review $review)
@@ -79,8 +68,9 @@ class ReviewController extends Controller
     /**
      * Remove the specified resource from storage.
      *
-     * @param  int  $id
+     * @param Review $review
      * @return \Illuminate\Http\Response
+     * @internal param int $id
      */
     public function destroy(Review $review)
     {
