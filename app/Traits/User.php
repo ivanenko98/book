@@ -13,9 +13,9 @@ use Illuminate\Support\Facades\Auth;
 trait User
 {
 
-    public function ifUser($book){
+    public function ifUser($model){
         $user = Auth::user();
-        if ($book->where('user_id', $user->id)){
+        if ($model->where('user_id', $user->id)){
             return true;
         }
         return false;

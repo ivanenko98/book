@@ -35,16 +35,6 @@ class FolderController extends Controller
     }
 
     /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function create()
-    {
-        //
-    }
-
-    /**
      * Store a newly created resource in storage.
      *
      * @param  \Illuminate\Http\Request  $request
@@ -68,17 +58,6 @@ class FolderController extends Controller
     }
 
     /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function edit($id)
-    {
-        //
-    }
-
-    /**
      * Update the specified resource in storage.
      *
      * @param  \Illuminate\Http\Request  $request
@@ -99,16 +78,23 @@ class FolderController extends Controller
      */
     public function destroy(Folder $folder)
     {
-        $folder->books()->delete();
-        foreach ($folder->books as $book){
-            $book->pages()->delete();
-        }
-        $folder->books()->delete();
-        $folder->delete();
 
+        $ifFolder = $folder->where('id', $folder->id)->get()->first();
+
+        if($this->ifUser($folder) == true){
+            if (!$ifFolder == null){
+                $folder->delete();
+                return response()->json([
+                    'msg' => 'Deleted'
+                ], 200);
+            }
+            return response()->json([
+                'msg' => 'This folder does not exist'
+            ]);
+        }
         return response()->json([
-            'msg' => 'Deleted'
-        ], 200);
+        'msg' => 'You cannot delete this folder'
+    ]);
     }
 
     public function defaultFolder($user_id){

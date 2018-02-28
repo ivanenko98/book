@@ -45,9 +45,19 @@ class Book extends Model
         return $this->hasMany(Page::class);
     }
 
+    protected static function boot() {
+
+        parent::boot();
+        static::deleting(function($book) {
+            $book->pages()->delete();
+            $book->reviews()->delete();
+        });
+    }
+
+
     public function purchases()
     {
-        return $this->hasMany('App\PurchasedBook');
+        return $this->hasMany(PurchasedBook::class);
     }
 
     public function genre(){
@@ -57,6 +67,7 @@ class Book extends Model
     public function reviews(){
         return $this->hasMany(Review::class);
     }
+
 
     /** ATTRIBUTE */
 

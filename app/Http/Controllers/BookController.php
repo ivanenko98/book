@@ -24,8 +24,6 @@ class BookController extends Controller
 
     public $data;
 
-    use User;
-
     public function index()
     {
         $user = Auth::user();
@@ -72,22 +70,22 @@ class BookController extends Controller
         return response()->json($book, 200);
     }
 
-    public function updateFolder(Request $request, Book $book, Folder $folder){
+    public function updateFolder(Request $request){
        $booksId = $request->book_id;
         $newFolderId = $request->folder_id;
-        $folderObject = $folder->where('id', $newFolderId)->select('name')->get();
+        $folderObject = Folder::where('id', $newFolderId)->select('name')->get();
         $folderName = $folderObject['0']->name;
 
         foreach ($booksId as $bookId){
-            $ifBook = $book->where('id', $bookId)->get()->first();
+            $ifBook = Book::where('id', $bookId)->get()->first();
             if (!$ifBook == null){
-                $book->where('id', $bookId)->update(['folder_id' => $newFolderId]);
+                Book::where('id', $bookId)->update(['folder_id' => $newFolderId]);
                 return response()->json([
                     "Book was added to " . $folderName . " folder successfully"
                 ], 200);
             } else {
                 return response()->json([
-                    "Book doesnt exist"
+                    "Book does not exist"
                 ]);
             }
         }
@@ -104,30 +102,19 @@ class BookController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy(Request $request, Book $book)
+    public function destroy(Request $request)
     {
         $ids = $request->all();
 
         foreach ($ids as $id) {
 
-            $check = $book->where('user_id', Auth::user()->id);
+            $book = Book::find($id);
 
-            if ($check == true){
-                $book->pages->where('book_id', $id)->delete();
-
+            if ($this->ifUser($book) == true){
+                $book->delete();
             } else {
                 dd('error');
             }
-
-            $book->where('id', $id)->delete();
-
-//            $pages = $book->pages->where('book_id', $id);
-//            foreach ($pages as $page) {
-//                if($page != null) {
-//                    $page->delete();
-//                }
-//            }
-
         }
         return response()->json(['success'=>"Products Deleted successfully."]);
 
