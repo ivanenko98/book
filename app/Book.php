@@ -21,6 +21,18 @@ class Book extends Model
         return $this->hasMany(Page::class);
     }
 
+    protected static function boot() {
+
+        parent::boot();
+        static::deleting(function (Book $book) {
+
+            foreach ($book->pages as $page)
+            {
+                $page->delete();
+            }
+        });
+    }
+
     public function genres(){
         return $this->belongsTo(Genre::class);
     }
@@ -28,4 +40,5 @@ class Book extends Model
     public function reviews(){
         return $this->hasMany(Review::class);
     }
+    
 }

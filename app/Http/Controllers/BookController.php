@@ -7,6 +7,7 @@ use App\Folder;
 use App\Genre;
 use App\Page;
 use App\Review;
+use App\Traits\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -20,6 +21,8 @@ class BookController extends Controller
     public $ifBook;
 
     public $data;
+
+    use User;
 
     public function index()
     {
@@ -138,30 +141,14 @@ class BookController extends Controller
      */
     public function destroy(Request $request, Book $book)
     {
-//        $book->delete($request->all());
-//        return response()->json('deleted', 200);
-
         $ids = $request->all();
+
         foreach ($ids as $id) {
-
-            $check = $book->where('user_id', Auth::user()->id);
-
-            if ($check == true){
-                $book->pages->where('book_id', $id)->delete();
-
+            if ($this->ifUser($book) == true){
+                $book->where('id', $id)->delete();
             } else {
-                dd('error');
+                return response()->json(['error'=>"You cannot delete these."]);
             }
-
-            $book->where('id', $id)->delete();
-
-//            $pages = $book->pages->where('book_id', $id);
-//            foreach ($pages as $page) {
-//                if($page != null) {
-//                    $page->delete();
-//                }
-//            }
-
         }
         return response()->json(['success'=>"Products Deleted successfully."]);
 

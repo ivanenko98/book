@@ -7,6 +7,7 @@ use App\DictionaryUA;
 use App\Page;
 use App\Word;
 use Illuminate\Http\Request;
+use Stichoza\GoogleTranslate\TranslateClient;
 
 class TranslateController extends Controller
 {
@@ -74,27 +75,41 @@ class TranslateController extends Controller
             $pages['next_page'] = $next_page;
         }
 
-        $bookArray = $this->bookArray($this->pages);
+        $bookArray = $this->bookArray($allPages);
 
-        return response()->json($bookArray, 200);
+        return $bookArray;
     }
 
     private function allPages(Request $request){
-        $all_pages = Page::where([
+
+        $ifPages = Page::where([
             'book_id' => $request->book_id,
         ])
-            ->get();
-        return $all_pages;
+            ->exists();
+
+        if ($ifPages == true){
+            $all_pages = Page::where([
+                'book_id' => $request->book_id,
+            ])
+                ->get();
+
+            return $all_pages;
+
+        } else {
+            return response()->json([
+                'Message' => 'This book does not exist.'
+            ]);
+        }
+
     }
 
-
     private function bookArray($pages){
+
         foreach ($pages as $page){
-            foreach ($page as $items){
-                preg_match_all("/.*?[.?!](?:\s|$)/s", $items->content, $items1);
-                foreach ($items1[0] as $item){
-                    $this->book_array['book']['page'.'-'. $items->id][] = $this->wordToObject($item);
-                }
+
+            preg_match_all("/.*?[.?!](?:\s|$)/s", $page->content, $items);
+            foreach ($items[0] as $item){
+                $this->book_array['book']['page'.'-'. $page->id][] = $this->wordToObject($item);
             }
         }
         return $this->book_array;
@@ -102,7 +117,6 @@ class TranslateController extends Controller
 
     private function keysPages($allPages){
         foreach ($allPages as $item) {
-            dd($item);
             $this->keys_pages[] = $item->id;
         }
         return $this->keys_pages;
@@ -153,18 +167,47 @@ class TranslateController extends Controller
 
     }
 
+    public function translateWord(Request $request){
+
+
+        $wordName = $request->word_name;
+
+        $translateFrom = 'uk';
+        $translateTo = 'en';
+
+        if(is_string($wordName)){
+            $translateWord = $this->googleTranslate($wordName, $translateFrom, $translateTo);
+            return $translateWord;
+        } else {
+            dd('This is not word!');
+        }
+    }
+
+    public function googleTranslate($word, $translateFrom, $translateTo){
+        $tr = new TranslateClient($translateFrom, $translateTo);
+        return $tr->translate($word);
+    }
+
+
     public function translate(Request $request){
+
         $allTranslateWords = DictionaryUA::all();
 
 
         $book = $this->loadPage($request);
 
-//        dd($book);
-
         foreach ($book['book'] as $bookPages) {
             foreach ($bookPages as $bookWords) {
                 foreach ($bookWords as $bookWord){
-                    $words[$bookWord->id] = $bookWord->name;
+
+                    $bookWordName = $bookWord->name;
+
+                    if (is_string($bookWordName)){
+
+                        $bookWordNameLowerCase = mb_strtolower($bookWordName);
+
+                        $this->words[$bookWord->id] = $bookWordNameLowerCase;
+                    }
                 }
             }
         }
@@ -173,17 +216,13 @@ class TranslateController extends Controller
             $allwords[] = $allTranslateWord->translateEn;
             foreach ($allwords as $allword){
                 foreach ($allword as $all){
-                    $relationAllWords[$all->word] = $all->pivot->pivotParent->word;
+                    $this->relationAllWords[$all->word] = $all->pivot->pivotParent->word;
                 }
             }
         }
 
-//        dd($words);
-//        dd($relationAllWords);
 
         $sameWords = array_intersect($this->relationAllWords, $this->words);
-
-
 
         foreach ($book['book'] as $bookPages) {
             foreach ($bookPages as $bookWords) {
@@ -197,11 +236,7 @@ class TranslateController extends Controller
             }
         }
 
-//        dd($book);
-
         return $book;
-
-
 
     }
 
