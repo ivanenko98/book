@@ -132,4 +132,6 @@ Route::group(['middleware' => 'auth:api'], function () {
     Route::get('/list-genres', 'StoreController@getListGenres');
     /** buy book */
     Route::post('/buy-book', 'StoreController@buyBook');
+    /** book to store */
+    Route::post('/book-to-store', 'StoreController@bookToStore');
 });
