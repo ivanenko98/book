@@ -107,6 +107,7 @@ Route::group(['middleware' => 'auth:api'], function () {
     /** TRANSLATE */
     Route::post('/get-book',['as' => 'get_book', 'uses' => 'TranslateController@getBook']);
     Route::post('/translate',['as' => 'translate', 'uses' => 'TranslateController@translate']);
+    Route::post('/translate-word',['as' => 'translate', 'uses' => 'TranslateController@translateWord']);
     Route::post('/load-page',['as' => 'load_page', 'uses' => 'TranslateController@loadPage']);
 
 

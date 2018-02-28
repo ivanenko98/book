@@ -17,6 +17,7 @@
         "robbiep/cloudconvert-laravel": "2.*",
         "smalot/pdfparser": "^0.11.0",
         "spatie/pdf-to-text": "^1.0",
+        "stichoza/google-translate-php": "^3.2",
         "tymon/jwt-auth": "^0.5.12"
     },
     "require-dev": {

@@ -8,6 +8,7 @@ use App\Genre;
 use App\Http\Requests\ImageRequest;
 use App\Page;
 use App\Review;
+use App\Traits\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
@@ -22,6 +23,8 @@ class BookController extends Controller
     public $ifBook;
 
     public $data;
+
+    use User;
 
     public function index()
     {
@@ -104,6 +107,7 @@ class BookController extends Controller
     public function destroy(Request $request, Book $book)
     {
         $ids = $request->all();
+
         foreach ($ids as $id) {
 
             $check = $book->where('user_id', Auth::user()->id);
@@ -116,6 +120,14 @@ class BookController extends Controller
             }
 
             $book->where('id', $id)->delete();
+
+//            $pages = $book->pages->where('book_id', $id);
+//            foreach ($pages as $page) {
+//                if($page != null) {
+//                    $page->delete();
+//                }
+//            }
+
         }
         return response()->json(['success'=>"Products Deleted successfully."]);
 
