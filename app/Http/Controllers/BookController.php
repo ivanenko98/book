@@ -160,7 +160,11 @@ class BookController extends Controller
 
         $imageName = time().'.'.request()->image->getClientOriginalExtension();
 
-        Storage::disk('local')->putFileAs('images', $request->image, $imageName);
+        $name = Storage::disk('local')->putFileAs('images', $request->image, $imageName);
+
+        $url = Storage::url($name);
+
+        dd($url);
 
         $book->image = $imageName;
         $book->save();

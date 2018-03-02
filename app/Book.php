@@ -3,6 +3,7 @@
 namespace App;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Storage;
 
 class Book extends Model
 {
@@ -10,6 +11,7 @@ class Book extends Model
     protected $fillable = ['name', 'description', 'author', 'likes', 'percent', 'folder_id', 'user_id'];
 
     protected $visible = [
+        'id',
         'name',
         'description',
         'author', 'likes',
@@ -30,7 +32,8 @@ class Book extends Model
         'pages',
         'reviews',
         'genre',
-        'translator'
+        'translator',
+        'image_path'
     ];
 
     public function folder(){
@@ -110,6 +113,17 @@ class Book extends Model
 
         if ($translator !== null) {
             return $translator;
+        } else {
+            return null;
+        }
+    }
+
+    public function getImagePathAttribute()
+    {
+        $link = Storage::url($this->image);
+
+        if ($link !== null) {
+            return $link;
         } else {
             return null;
         }
