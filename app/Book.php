@@ -26,6 +26,7 @@ class Book extends Model
         'reviews',
         'genre',
         'translator',
+        'image_path'
     ];
 
     protected $appends = [
