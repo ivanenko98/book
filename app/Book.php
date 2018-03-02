@@ -121,10 +121,10 @@ class Book extends Model
 
     public function getImagePathAttribute()
     {
-        $link = Storage::url($this->image);
+        $link = Storage::disk('local')->url($this->image);
 
         if ($link !== null) {
-            return env('APP_URL').$link;
+            return $link;
         } else {
             return null;
         }
