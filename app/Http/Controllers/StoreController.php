@@ -7,6 +7,7 @@ use App\Genre;
 use App\PurchasedBook;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Validator;
 
 
 class StoreController extends Controller
@@ -15,7 +16,7 @@ class StoreController extends Controller
 
     public function getPopularBooks()
     {
-        $books = Book::orderBy('buyers', 'desc')->limit(10)->get();
+        $books = Book::where('store', 1)->orderBy('buyers', 'desc')->limit(10)->get();
 
         return $this->formatResponse('success', null, $books);
     }
@@ -29,7 +30,7 @@ class StoreController extends Controller
 
         $purchased_books = PurchasedBook::where('buyer_id', $user->id)->get();
 
-        $books = Book::all();
+        $books = Book::where('store', 1)->get();
 
         if ($books->count() <= $this->number) {
             return $this->formatResponse('success', null, $books);
@@ -52,7 +53,10 @@ class StoreController extends Controller
                 }
 
                 foreach ($genres as $genre_id) {
-                    $books = Book::where('genre_id', $genre_id)->orderBy('buyers', 'desc')->get();
+                    $books = Book::where(
+                        ['genre_id', $genre_id],
+                        ['store', 1]
+                    )->orderBy('buyers', 'desc')->get();
 
                     if ($books->count() > 0) {
 
@@ -76,7 +80,7 @@ class StoreController extends Controller
                 }
             }
         } else {
-            $books = Book::orderBy('buyers', 'desc')->limit(10)->get();
+            $books = Book::where('store', 1)->orderBy('buyers', 'desc')->limit(10)->get();
             return $this->formatResponse('success', null, $books);
         }
 
@@ -85,7 +89,7 @@ class StoreController extends Controller
 
     public function getNewBooks()
     {
-        $books = Book::orderBy('created_at', 'desc')->limit(10)->get();
+        $books = Book::where('store', 1)->orderBy('created_at', 'desc')->limit(10)->get();
 
         return $this->formatResponse('success', null, $books);
     }
@@ -110,6 +114,18 @@ class StoreController extends Controller
 
     public function buyBook(Request $request)
     {
+        $validator = Validator::make($request->all(),[
+            'buyer_id'            => 'required',
+            'book_id'             => 'required',
+            'seller_id'           => 'required',
+            'price'               => 'required',
+        ]);
+
+        if ($validator->fails()){
+            $response = $this->arrayResponse('error','incorrect data', $validator->errors());
+            return response($response, 200);
+        }
+
         $purchased_book_db = PurchasedBook::where([
             ['buyer_id', $request->buyer_id],
             ['book_id', $request->book_id]
@@ -118,6 +134,10 @@ class StoreController extends Controller
         if ($purchased_book_db !== null) {
             return $this->formatResponse('error', 'this book is already bought');
         }
+
+        $book = Book::find($request->book_id);
+
+        $book->save();
 
         $purchased_book = new PurchasedBook();
 
@@ -175,5 +195,33 @@ class StoreController extends Controller
     {
         $genres = Genre::all();
         return $this->formatResponse('success', null, $genres);
+    }
+
+    public function bookToStore(Request $request)
+    {
+        $validator = Validator::make($request->all(),[
+            'book_id'             => 'required',
+            'genre_id'            => 'required'
+        ]);
+
+        if ($validator->fails()){
+            $response = $this->arrayResponse('error','incorrect data', $validator->errors());
+            return response($response, 200);
+        }
+
+        $book = Book::find($request->book_id);
+
+        if ($book == null) {
+            $response = $this->arrayResponse('error','book not found');
+            return response($response, 200);
+        }
+
+        $book->store = 1;
+        $book->genre_id = $request->genre_id;
+
+        $book->save();
+
+        $response = $this->arrayResponse('success',null);
+        return response($response, 200);
     }
 }
