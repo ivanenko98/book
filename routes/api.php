@@ -24,6 +24,8 @@ Route::get('/logout', 'Auth\LoginController@logout');
 Route::post('password/email', 'Auth\ForgotPasswordController@getResetToken');
 Route::post('password/reset', 'Auth\ResetPasswordController@reset');
 Route::post('user/reset-password', 'Auth\ResetPasswordController@userPasswordReset');
+Route::post('/reset-password-send-sms', 'Auth\ResetPasswordController@resetPasswordSendSMS');
+Route::post('/reset-password-from-sms', 'Auth\ResetPasswordController@resetPasswordFromSMS');
 
 Route::group(['middleware' => 'auth:api'], function () {
 
