@@ -162,6 +162,8 @@ class BookController extends Controller
 
         Storage::disk('public')->putFileAs('images', $request->image, $imageName);
 
+//        dd(Storage::disk('public')->url($imageName));
+
         $book->image = $imageName;
         $book->save();
 
