@@ -155,12 +155,12 @@ class BookController extends Controller
         }
 
         if ($book->image !== null) {
-            Storage::disk('public')->delete('images/' . $book->image);
+            Storage::disk('custom')->delete($book->image);
         }
 
         $imageName = time().'.'.request()->image->getClientOriginalExtension();
 
-        Storage::disk('public')->putFileAs('images', $request->image, $imageName);
+        Storage::disk('custom')->putFileAs('', $request->image, $imageName);
 
 //        dd(Storage::disk('public')->url($imageName));
 
