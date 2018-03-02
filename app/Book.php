@@ -26,7 +26,6 @@ class Book extends Model
         'reviews',
         'genre',
         'translator',
-        'image_path'
     ];
 
     protected $appends = [
@@ -34,7 +33,6 @@ class Book extends Model
         'reviews',
         'genre',
         'translator',
-        'image_path'
     ];
 
     public function folder(){
@@ -114,17 +112,6 @@ class Book extends Model
 
         if ($translator !== null) {
             return $translator;
-        } else {
-            return null;
-        }
-    }
-
-    public function getImagePathAttribute()
-    {
-        $link = ::disk('local')->url($this->image);
-
-        if ($link !== null) {
-            return $link;
         } else {
             return null;
         }
