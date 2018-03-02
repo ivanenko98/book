@@ -124,7 +124,7 @@ class Book extends Model
         $link = Storage::url($this->image);
 
         if ($link !== null) {
-            return $link;
+            return env('APP_URL').$link;
         } else {
             return null;
         }
