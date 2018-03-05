@@ -30,6 +30,8 @@ Route::post('/reset-password-from-sms', 'Auth\ResetPasswordController@resetPassw
 Route::group(['middleware' => 'auth:api'], function () {
 
     /** USER */
+    /** change password */
+    Route::post('/change-password', 'UserController@changePassword');
     /** get purchased books */
     Route::get('/purchased-books', 'StoreController@getPurchasedBooks');
     /** get sold books */
@@ -38,6 +40,10 @@ Route::group(['middleware' => 'auth:api'], function () {
     Route::post('/archive-book', 'StoreController@archivingBook');
     /** restore book */
     Route::post('/restore-book', 'StoreController@restoreBook');
+    /** list archived books */
+    Route::get('/list-archived-books', 'StoreController@listArchivedBooks');
+    /** show list books of store for translator */
+    Route::get('/get-books-in-store', 'UserController@getBooksInStore');
 
     /** FACEBOOK SOCIALITE */
     Route::get('login/facebook', 'Auth\LoginController@redirectToProvider');

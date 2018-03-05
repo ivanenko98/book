@@ -95,7 +95,7 @@ class LoginController extends Controller
             $user = $this->guard()->user();
             $user->generateToken(true);
 
-            $response = $this->arrayResponse('success',null);
+            $response = $this->arrayResponse('success',null, $user);
             return response($response, 200);
         } else {
             return [

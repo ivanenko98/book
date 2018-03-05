@@ -155,18 +155,20 @@ class StoreController extends Controller
     {
         $user = Auth::user();
 
-        $purchased_book = PurchasedBook::where([
-            ['buyer_id', $user->id],
-            ['book_id', $request->book_id],
-        ])->get()->first();
+        foreach ($request->books as $book_id) {
+            $purchased_book = PurchasedBook::where([
+                ['buyer_id', $user->id],
+                ['book_id', $book_id],
+            ])->get()->first();
 
-        if ($purchased_book == null) {
-            return $this->formatResponse('success', 'book not found');
+            if ($purchased_book == null) {
+                return $this->formatResponse('error', 'book not found id: '. $book_id);
+            }
+
+            $purchased_book->status = 'archived';
+
+            $purchased_book->save();
         }
-
-        $purchased_book->status = 'archived';
-
-        $purchased_book->save();
 
         return $this->formatResponse('success', null);
     }
@@ -175,20 +177,34 @@ class StoreController extends Controller
     {
         $user = Auth::user();
 
-        $purchased_book = PurchasedBook::where([
-            ['buyer_id', $user->id],
-            ['book_id', $request->book_id],
-        ])->get()->first();
+        foreach ($request->books as $book_id) {
+            $purchased_book = PurchasedBook::where([
+                ['buyer_id', $user->id],
+                ['book_id', $book_id],
+            ])->get()->first();
 
-        if ($purchased_book == null) {
-            return $this->formatResponse('success', 'book not found');
+            if ($purchased_book == null) {
+                return $this->formatResponse('error', 'book not found id: '. $book_id);
+            }
+
+            $purchased_book->status = 'available';
+
+            $purchased_book->save();
         }
 
-        $purchased_book->status = 'available';
-
-        $purchased_book->save();
-
         return $this->formatResponse('success', null);
+    }
+
+    public function listArchivedBooks()
+    {
+        $user = Auth::user();
+
+        $archived_books = PurchasedBook::where([
+            ['buyer_id', $user->id],
+            ['status', 'archived'],
+        ])->get();
+
+        return $this->formatResponse('success', null, $archived_books);
     }
 
     public function getListGenres()

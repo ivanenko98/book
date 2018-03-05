@@ -146,5 +146,23 @@ class ResetPasswordController extends Controller
         $user->update([
             'password' => bcrypt($request->password)
         ]);
+
+        $request_sms->delete();
+
+        $response = $this->arrayResponse('success',null);
+        return response($response, 200);
+    }
+
+    public function checkCode(Request $request)
+    {
+        $request_sms = ResetPasswordSMSRequest::where('code', $request->code)->first();
+
+        if ($request_sms == null) {
+            $response = $this->arrayResponse('error','code invalid');
+            return response($response, 200);
+        } else {
+            $response = $this->arrayResponse('success',null);
+            return response($response, 200);
+        }
     }
 }
