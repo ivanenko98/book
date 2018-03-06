@@ -32,6 +32,14 @@ Route::group(['middleware' => 'auth:api'], function () {
     /** USER */
     /** change password */
     Route::post('/change-password', 'UserController@changePassword');
+    /** change name */
+    Route::post('/change-name', 'UserController@changeName');
+    /** send code for change phone */
+    Route::post('/send-change-phone', 'UserController@sendSMSForChangePhone');
+    /** change phone */
+    Route::post('/change-phone', 'UserController@changePhone');
+    /** upload image user */
+    Route::post('/image-user', 'UserController@uploadImage');
     /** get purchased books */
     Route::get('/purchased-books', 'StoreController@getPurchasedBooks');
     /** get sold books */
@@ -66,34 +74,13 @@ Route::group(['middleware' => 'auth:api'], function () {
     Route::post('/book-folder', 'BookController@updateFolder');
     /** show list books of folder */
     Route::get('/get-books/{folder}', 'BookController@getBooks');
-
-    /**
-     * search books
-     *
-     * parameters: keyword
-     */
+    /** search books */
     Route::post('/search-books', 'BookController@searchBooks');
-
-    /**
-     * list books
-     *
-     * parameters: genre_id
-     */
+    /** list books of genre */
     Route::post('/list-books', 'BookController@listBooks');
-
-    /**
-     * upload image book
-     *
-     * parameters: file
-     */
+    /** upload image book*/
     Route::post('/image-book', 'BookController@uploadImage');
 
-    /**
-     * upload image user
-     *
-     * parameters: file
-     */
-    Route::post('/image-user', 'UserController@uploadImage');
 
     /** FOLDERS */
     /** show folders list */
@@ -143,4 +130,13 @@ Route::group(['middleware' => 'auth:api'], function () {
     Route::post('/buy-book', 'StoreController@buyBook');
     /** book to store */
     Route::post('/book-to-store', 'StoreController@bookToStore');
+
+
+    /** DICTIONARY */
+    /** list words */
+    Route::get('/list-words', 'DictionaryController@listWords');
+    /** add word to dictionary */
+    Route::post('/add-word', 'DictionaryController@addToDictionary');
+    /** remove word from dictionary */
+    Route::post('/remove-word', 'UserController@removeFromDictionary');
 });

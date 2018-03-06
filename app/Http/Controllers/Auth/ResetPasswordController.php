@@ -87,49 +87,34 @@ class ResetPasswordController extends Controller
     {
         $user = User::where('phone', $request->phone)->first();
 
-        if ($user) {
-            $code = rand(241866, 894388);
+        $old_request = ResetPasswordSMSRequest::where('user_id', $user->id)->first();
 
-            $old_request = ResetPasswordSMSRequest::where('code', $code)->first();
-
-            if ($old_request == null) {
-
-                $new_request = new ResetPasswordSMSRequest();
-                $new_request->code = $code;
-                $new_request->user_id = $user->id;
-                $new_request->save();
-
-                Nexmo::message()->send([
-                    'to'   => $request->phone,
-                    'from' => 'Book Translate',
-                    'text' => $code
-                ]);
-
-                $response = $this->arrayResponse('success',null);
-                return response($response, 200);
-
-            } else {
-                $code = rand(241855, 894377);
-
-                $new_request = new ResetPasswordSMSRequest();
-                $new_request->code = $code;
-                $new_request->user_id = $user->id;
-                $new_request->save();
-
-                Nexmo::message()->send([
-                    'to'   => $request->phone,
-                    'from' => 'Book Translate',
-                    'text' => $code
-                ]);
-
-                $response = $this->arrayResponse('success',null);
-                return response($response, 200);
-            }
-
-        } else {
-            $response = $this->arrayResponse('error','user not found');
-            return response($response, 200);
+        if ($old_request !== null) {
+            $old_request->delete();
         }
+
+        $code = rand(100000, 999999);
+
+        $old_code = ResetPasswordSMSRequest::where('code', $code)->first();
+
+        while ($old_code !== null) {
+            $code = rand(100000, 999999);
+            $old_code = ResetPasswordSMSRequest::where('code', $code)->first();
+        }
+
+        $new_request = new ResetPasswordSMSRequest();
+        $new_request->code = $code;
+        $new_request->user_id = $user->id;
+        $new_request->save();
+
+        Nexmo::message()->send([
+            'to'   => $request->phone,
+            'from' => 'Book Translate',
+            'text' => 'Your verification code: ' . $code
+        ]);
+
+        $response = $this->arrayResponse('success',null);
+        return response($response, 200);
     }
 
     public function resetPasswordFromSMS(Request $request)
