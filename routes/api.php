@@ -138,5 +138,7 @@ Route::group(['middleware' => 'auth:api'], function () {
     /** add word to dictionary */
     Route::post('/add-word', 'DictionaryController@addToDictionary');
     /** remove word from dictionary */
-    Route::post('/remove-word', 'UserController@removeFromDictionary');
+    Route::post('/remove-word', 'DictionaryController@removeFromDictionary');
+    /** search words */
+    Route::post('/search-words', 'DictionaryController@searchWords');
 });
