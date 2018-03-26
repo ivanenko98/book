@@ -25,7 +25,8 @@ class UploadController extends Controller
 
     public function upload(Request $request)
     {
-
+        dd(11);
+        dd($request->file);
         if ($request->hasFile('file')) {
             $request->file('file')->store('docs');
         } else {
@@ -34,7 +35,6 @@ class UploadController extends Controller
                 'msg' => 'Error'
             ]);
         }
-
         $this->filename = $request->file->hashName();
         $this->path = Storage::path('docs').'/'.$this->filename;
         $book = $this->createBook($request);
