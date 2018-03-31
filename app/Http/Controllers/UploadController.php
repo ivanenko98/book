@@ -23,7 +23,7 @@ class UploadController extends Controller
 
     public $page_in_db;
 
-    public function upload(Request $request)
+    public function upload(UploadRequest $request)
     {
 
         if ($request->hasFile('file')) {
