@@ -10,6 +10,8 @@ class User extends Authenticatable
 {
     use Notifiable;
 
+    public $rating = 0;
+
     /**
      * The attributes that are mass assignable.
      *
@@ -89,28 +91,22 @@ class User extends Authenticatable
         return $this->hasMany(Review::class);
     }
 
-
     public function getRatingAttribute()
     {
-//        dd($this->soldBooks);
-        $rating = 0;
+        $count_reviews = 0;
         foreach ($this->soldBooks as $soldBook) {
 
             foreach ($soldBook->book->reviews as $review) {
-                $rating = (int)$rating + (int)$review->rating;
-//               dd($rating);
+                $this->rating = (int)$this->rating + (int)$review->rating;
+                $count_reviews = $count_reviews + $soldBook->book->reviews->count();
             }
         }
 
-//        dd($this->soldBooks);
-
-        return $rating;
-
-//        if ($rating == 0) {
-//            return null;
-//        } else {
-//            return $rating;
-//        }
+        if ($this->rating == null) {
+            return null;
+        } else {
+            $sum = $this->rating/$count_reviews;
+            return $sum;
+        }
     }
-
 }

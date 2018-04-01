@@ -95,10 +95,8 @@ class LoginController extends Controller
             $user = $this->guard()->user();
             $user->generateToken(true);
 
-            return [
-                'status'=>200,
-                'user'=>$user
-            ];
+            $response = $this->arrayResponse('success',null, $user);
+            return response($response, 200);
         } else {
             return [
                 'status'=>false,

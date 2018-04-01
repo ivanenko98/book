@@ -63,9 +63,14 @@ class UploadController extends Controller
 
     public function createPage($book_id, $content){
         $page = new Page();
+
         $page->book_id = $book_id;
+
         $page->content = $content;
-        return $page->save();
+
+        $page->save();
+
+        return $page;
     }
 
     public function createBook($request){

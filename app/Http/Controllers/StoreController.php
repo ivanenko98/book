@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Book;
 use App\Genre;
+use App\Page;
 use App\PurchasedBook;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -155,18 +156,20 @@ class StoreController extends Controller
     {
         $user = Auth::user();
 
-        $purchased_book = PurchasedBook::where([
-            ['buyer_id', $user->id],
-            ['book_id', $request->book_id],
-        ])->get()->first();
+        foreach ($request->books as $book_id) {
+            $purchased_book = PurchasedBook::where([
+                ['buyer_id', $user->id],
+                ['book_id', $book_id],
+            ])->get()->first();
 
-        if ($purchased_book == null) {
-            return $this->formatResponse('success', 'book not found');
+            if ($purchased_book == null) {
+                return $this->formatResponse('error', 'book not found id: '. $book_id);
+            }
+
+            $purchased_book->status = 'archived';
+
+            $purchased_book->save();
         }
-
-        $purchased_book->status = 'archived';
-
-        $purchased_book->save();
 
         return $this->formatResponse('success', null);
     }
@@ -175,20 +178,34 @@ class StoreController extends Controller
     {
         $user = Auth::user();
 
-        $purchased_book = PurchasedBook::where([
-            ['buyer_id', $user->id],
-            ['book_id', $request->book_id],
-        ])->get()->first();
+        foreach ($request->books as $book_id) {
+            $purchased_book = PurchasedBook::where([
+                ['buyer_id', $user->id],
+                ['book_id', $book_id],
+            ])->get()->first();
 
-        if ($purchased_book == null) {
-            return $this->formatResponse('success', 'book not found');
+            if ($purchased_book == null) {
+                return $this->formatResponse('error', 'book not found id: '. $book_id);
+            }
+
+            $purchased_book->status = 'available';
+
+            $purchased_book->save();
         }
 
-        $purchased_book->status = 'available';
-
-        $purchased_book->save();
-
         return $this->formatResponse('success', null);
+    }
+
+    public function listArchivedBooks()
+    {
+        $user = Auth::user();
+
+        $archived_books = PurchasedBook::where([
+            ['buyer_id', $user->id],
+            ['status', 'archived'],
+        ])->get();
+
+        return $this->formatResponse('success', null, $archived_books);
     }
 
     public function getListGenres()
@@ -223,5 +240,117 @@ class StoreController extends Controller
 
         $response = $this->arrayResponse('success',null);
         return response($response, 200);
+    }
+
+    public function loadPage(Request $request){
+
+        $allPages = $this->allPages($request);
+
+        $keysPages = $this->keysPages($allPages);
+
+        $prev_page = $this->prevPage($keysPages, $request->book_id, $request->current_page);
+
+        $next_page = $this->nextPage($keysPages, $request->book_id, $request->current_page);
+
+        $current_page = Page::where([
+            'book_id' => $request->book_id,
+            'id' => $request->current_page
+        ])
+            ->get();
+
+
+        if ($prev_page != null) {
+            $pages['prev_page'] = $prev_page;
+        }
+
+        if ($current_page != null) {
+            $pages['current_page'] = $current_page;
+        }
+
+        if ($next_page != null) {
+            $pages['next_page'] = $next_page;
+        }
+
+        $bookArray = $this->bookArray($allPages);
+
+        return $bookArray;
+    }
+
+    private function allPages(Request $request){
+
+        $ifPages = Page::where([
+            'book_id' => $request->book_id,
+        ])
+            ->exists();
+
+        if ($ifPages == true){
+            $all_pages = Page::where([
+                'book_id' => $request->book_id,
+            ])
+                ->get();
+
+            return $all_pages;
+
+        } else {
+            return response()->json([
+                'Message' => 'This book does not exist.'
+            ]);
+        }
+
+    }
+
+    private function prevPage($keys_pages, $book_id, $current_page){
+
+        if ($keys_pages[0] !== $current_page){
+            if(isset($keys_pages)){
+                foreach ($keys_pages as $key_page) {
+
+                    if($key_page == $current_page){
+                        $id_prev_page = $keys_pages[array_search($key_page, $keys_pages) - 1];
+
+                        $prev_page = Page::where([
+                            'book_id' => $book_id,
+                            'id' => $id_prev_page
+                        ])
+                            ->get();
+
+                        return $prev_page;
+                    }
+                }
+            }
+        }else{
+            return null;
+        }
+    }
+
+    private function nextPage($keys_pages, $book_id, $current_page){
+
+        if (end($keys_pages)!== $current_page){
+            if(isset($keys_pages)){
+                foreach ($keys_pages as $key_page) {
+
+                    if($key_page == $current_page){
+                        $id_next_page = $keys_pages[array_search($key_page, $keys_pages) + 1];
+
+                        $next_page = Page::where([
+                            'book_id' => $book_id,
+                            'id' => $id_next_page
+                        ])
+                            ->get();
+
+                        return $next_page;
+                    }
+                }
+            }
+        }else{
+            return null;
+        }
+    }
+
+    private function keysPages($allPages){
+        foreach ($allPages as $item) {
+            $this->keys_pages[] = $item->id;
+        }
+        return $this->keys_pages;
     }
 }
