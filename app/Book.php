@@ -30,7 +30,7 @@ class Book extends Model
     ];
 
     protected $appends = [
-        'pages',
+//        'pages',
         'rating',
         'reviews',
         'genre',
@@ -75,16 +75,16 @@ class Book extends Model
 
     /** ATTRIBUTE */
 
-    public function getPagesAttribute()
-    {
-        $pages = Page::where('book_id', $this->genre_id)->get();
-
-        if ($pages !== null) {
-            return $pages->count();
-        } else {
-            return null;
-        }
-    }
+//    public function getPagesAttribute()
+//    {
+//        $pages = Page::where('book_id', $this->genre_id)->get();
+//
+//        if ($pages !== null) {
+//            return $pages->count();
+//        } else {
+//            return null;
+//        }
+//    }
 
     public function getRatingAttribute()
     {

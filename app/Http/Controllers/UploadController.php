@@ -23,10 +23,9 @@ class UploadController extends Controller
 
     public $page_in_db;
 
-    public function upload(Request $request)
+    public function upload(UploadRequest $request)
     {
-        dd(11);
-        dd($request->file);
+
         if ($request->hasFile('file')) {
             $request->file('file')->store('docs');
         } else {
@@ -35,6 +34,7 @@ class UploadController extends Controller
                 'msg' => 'Error'
             ]);
         }
+
         $this->filename = $request->file->hashName();
         $this->path = Storage::path('docs').'/'.$this->filename;
         $book = $this->createBook($request);
@@ -63,9 +63,14 @@ class UploadController extends Controller
 
     public function createPage($book_id, $content){
         $page = new Page();
+
         $page->book_id = $book_id;
+
         $page->content = $content;
-        return $page->save();
+
+        $page->save();
+
+        return $page;
     }
 
     public function createBook($request){

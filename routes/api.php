@@ -102,9 +102,14 @@ Route::group(['middleware' => 'auth:api'], function () {
     /** TRANSLATE */
     Route::post('/get-book',['as' => 'get_book', 'uses' => 'TranslateController@getBook']);
     Route::post('/translate',['as' => 'translate', 'uses' => 'TranslateController@translate']);
+    /** translating word using google translator */
     Route::post('/translate-word',['as' => 'translate', 'uses' => 'TranslateController@translateWord']);
-    Route::post('/load-page',['as' => 'load_page', 'uses' => 'TranslateController@loadPage']);
-
+    /** show all words of book as objects */
+    Route::post('/get-full-text',['as' => 'full-text', 'uses' => 'BookController@getFullText']);
+    /** show three pages (current_page, prev_page, next_page) */
+    Route::post('/load-page',['as' => 'load_page', 'uses' => 'BookController@loadPage']);
+    /** show list pages for book */
+    Route::post('/list-pages', 'BookController@listPages');
 
     /** REVIEWS */
     /** show reviews list for book */

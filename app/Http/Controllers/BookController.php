@@ -6,6 +6,7 @@ use App\Book;
 use App\Folder;
 use App\Genre;
 use App\Http\Requests\ImageRequest;
+use App\Http\Traits\Translate;
 use App\Page;
 use App\Review;
 use App\Traits\User;
@@ -15,11 +16,10 @@ use Illuminate\Support\Facades\Storage;
 
 class BookController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
+    use Translate;
+
+    const DEMONSTRATION_PAGES = 10;
+
     public $ifBook;
 
     public $data;
@@ -168,6 +168,72 @@ class BookController extends Controller
         $book->save();
 
         $response = $this->arrayResponse('success', null);
+        return response($response, 200);
+    }
+
+    public function getFullText(Request $request)
+    {
+        $allPages = $this->allPages($request);
+
+        $bookArray = $this->bookArray($allPages);
+
+        return $bookArray;
+    }
+
+    public function listPages(Request $request)
+    {
+        $user = Auth::user();
+
+        $purchased_book = $user->purchasedBooks->where('book_id', $request->book_id)->first();
+
+        if ($purchased_book !== null && $purchased_book->status == 'demonstration') {
+            $allPages = $purchased_book->book->pages->take(self::DEMONSTRATION_PAGES);
+        } else {
+            $allPages = $this->allPages($request);
+        }
+
+        $response = $this->arrayResponse('success', null, $allPages);
+        return response($response, 200);
+    }
+
+    public function loadPage(Request $request)
+    {
+        $user = Auth::user();
+
+        $purchased_book = $user->purchasedBooks->where('book_id', $request->book_id)->first();
+
+        if ($purchased_book !== null && $purchased_book->status == 'demonstration') {
+            $allPages = $purchased_book->book->pages->take(self::DEMONSTRATION_PAGES);
+        } else {
+            $allPages = $this->allPages($request);
+        }
+
+        $keysPages = $this->keysPages($allPages);
+
+        $current_page = Page::where('book_id', $request->book_id)
+            ->skip($request->current_page - 1)
+            ->limit(1)
+            ->first();
+
+        $prev_page = $this->prevPage($keysPages, $request->book_id, $current_page->id);
+
+        $next_page = $this->nextPage($keysPages, $request->book_id, $current_page->id);
+
+        $pages = [];
+
+        if ($prev_page != null) {
+            $pages['prev_page'] = $prev_page;
+        }
+
+        if ($current_page != null) {
+            $pages['current_page'] = $current_page;
+        }
+
+        if ($next_page != null) {
+            $pages['next_page'] = $next_page;
+        }
+
+        $response = $this->arrayResponse('success', null, $pages);
         return response($response, 200);
     }
 }
