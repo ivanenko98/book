@@ -5,11 +5,13 @@ namespace App\Http\Controllers\Auth;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\ResetPasswordRequest;
 use App\PasswordReset;
+use App\ResetPasswordSMSRequest;
 use App\Transformers\Json;
 use App\User;
 use Illuminate\Foundation\Auth\ResetsPasswords;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Password;
+use Nexmo\Laravel\Facade\Nexmo;
 
 class ResetPasswordController extends Controller
 {
@@ -79,5 +81,73 @@ class ResetPasswordController extends Controller
             'password' => bcrypt($request->get('password'))
         ]);
         return response()->json(['status'=>true,'message'=>'Password was updated successfully','data'=>$user]);
+    }
+
+    public function resetPasswordSendSMS(Request $request)
+    {
+        $user = User::where('phone', $request->phone)->first();
+
+        $old_request = ResetPasswordSMSRequest::where('user_id', $user->id)->first();
+
+        if ($old_request !== null) {
+            $old_request->delete();
+        }
+
+        $code = rand(100000, 999999);
+
+        $old_code = ResetPasswordSMSRequest::where('code', $code)->first();
+
+        while ($old_code !== null) {
+            $code = rand(100000, 999999);
+            $old_code = ResetPasswordSMSRequest::where('code', $code)->first();
+        }
+
+        $new_request = new ResetPasswordSMSRequest();
+        $new_request->code = $code;
+        $new_request->user_id = $user->id;
+        $new_request->save();
+
+        Nexmo::message()->send([
+            'to'   => $request->phone,
+            'from' => 'Book Translate',
+            'text' => 'Your verification code: ' . $code
+        ]);
+
+        $response = $this->arrayResponse('success',null);
+        return response($response, 200);
+    }
+
+    public function resetPasswordFromSMS(Request $request)
+    {
+        $request_sms = ResetPasswordSMSRequest::where('code', $request->code)->first();
+
+        if ($request_sms == null) {
+            $response = $this->arrayResponse('error','code invalid');
+            return response($response, 200);
+        }
+
+        $user = User::find($request_sms->user_id);
+
+        $user->update([
+            'password' => bcrypt($request->password)
+        ]);
+
+        $request_sms->delete();
+
+        $response = $this->arrayResponse('success',null);
+        return response($response, 200);
+    }
+
+    public function checkCode(Request $request)
+    {
+        $request_sms = ResetPasswordSMSRequest::where('code', $request->code)->first();
+
+        if ($request_sms == null) {
+            $response = $this->arrayResponse('error','code invalid');
+            return response($response, 200);
+        } else {
+            $response = $this->arrayResponse('success',null);
+            return response($response, 200);
+        }
     }
 }

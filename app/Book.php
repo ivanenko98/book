@@ -3,6 +3,7 @@
 namespace App;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Storage;
 
 class Book extends Model
 {
@@ -10,6 +11,7 @@ class Book extends Model
     protected $fillable = ['name', 'description', 'author', 'likes', 'percent', 'folder_id', 'user_id'];
 
     protected $visible = [
+        'id',
         'name',
         'description',
         'author', 'likes',
@@ -21,16 +23,18 @@ class Book extends Model
         'updated_at',
         'genre_name',
         'pages',
-        'reviews',
+        'rating',
+//        'reviews',
         'genre',
         'translator',
     ];
 
     protected $appends = [
         'pages',
-        'reviews',
+        'rating',
+//        'reviews',
         'genre',
-        'translator'
+        'translator',
     ];
 
     public function folder(){
@@ -73,7 +77,7 @@ class Book extends Model
 
     public function getPagesAttribute()
     {
-        $pages = Page::where('book_id', $this->genre_id)->get();
+        $pages = Page::where('book_id', $this->id)->get();
 
         if ($pages !== null) {
             return $pages->count();
@@ -82,16 +86,35 @@ class Book extends Model
         }
     }
 
-    public function getReviewsAttribute()
+    public function getRatingAttribute()
     {
         $reviews = Review::where('book_id', $this->id)->get();
 
-        if ($reviews !== null) {
-            return $reviews;
-        } else {
+        $rating = 0;
+        $count_reviews = 0;
+        foreach ($reviews as $review) {
+            $rating = (int)$rating + (int)$review->rating;
+            $count_reviews = $count_reviews + 1;
+        }
+
+        if ($rating == null) {
             return null;
+        } else {
+            $sum = $rating/$count_reviews;
+            return $sum;
         }
     }
+
+//    public function getReviewsAttribute()
+//    {
+//        $reviews = Review::where('book_id', $this->id)->get();
+//
+//        if ($reviews !== null) {
+//            return $reviews;
+//        } else {
+//            return null;
+//        }
+//    }
 
     public function getGenreAttribute()
     {
@@ -109,7 +132,7 @@ class Book extends Model
         $translator = User::find($this->user_id);
 
         if ($translator !== null) {
-            return $translator;
+            return $translator->name;
         } else {
             return null;
         }

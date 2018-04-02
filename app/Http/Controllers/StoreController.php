@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Book;
 use App\Genre;
+use App\Page;
 use App\PurchasedBook;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -118,7 +119,8 @@ class StoreController extends Controller
             'buyer_id'            => 'required',
             'book_id'             => 'required',
             'seller_id'           => 'required',
-            'price'               => 'required',
+            'price'               => 'required_if: demonstration, 0',
+            'demonstration'       => 'required',
         ]);
 
         if ($validator->fails()){
@@ -127,15 +129,28 @@ class StoreController extends Controller
         }
 
         $purchased_book_db = PurchasedBook::where([
-            ['buyer_id', $request->buyer_id],
-            ['book_id', $request->book_id]
+            'buyer_id' => $request->buyer_id,
+            'book_id' => $request->book_id
         ])->get()->first();
 
         if ($purchased_book_db !== null) {
-            return $this->formatResponse('error', 'this book is already bought');
+            if ($purchased_book_db->status == 'demonstration') {
+                if ($request->demonstration == 1) {
+                    return $this->formatResponse('error', 'demo version book already buyed');
+                } else {
+                    $purchased_book_db->status = 'available';
+                    $purchased_book_db->price = $request->price;
+                    $purchased_book_db->save();
+                    return $this->formatResponse('success', null);
+                }
+            } else {
+                return $this->formatResponse('error', 'this book is already bought');
+            }
         }
 
         $book = Book::find($request->book_id);
+
+        $book->buyers = $book->buyers + 1;
 
         $book->save();
 
@@ -146,6 +161,10 @@ class StoreController extends Controller
         $purchased_book->book_id = $request->book_id;
         $purchased_book->price = $request->price;
 
+        if ($request->demonstration == 1) {
+            $purchased_book->status = 'demonstration';
+        }
+
         $purchased_book->save();
 
         return $this->formatResponse('success', null);
@@ -155,18 +174,20 @@ class StoreController extends Controller
     {
         $user = Auth::user();
 
-        $purchased_book = PurchasedBook::where([
-            ['buyer_id', $user->id],
-            ['book_id', $request->book_id],
-        ])->get()->first();
+        foreach ($request->books as $book_id) {
+            $purchased_book = PurchasedBook::where([
+                ['buyer_id', $user->id],
+                ['book_id', $book_id],
+            ])->get()->first();
 
-        if ($purchased_book == null) {
-            return $this->formatResponse('success', 'book not found');
+            if ($purchased_book == null) {
+                return $this->formatResponse('error', 'book not found id: '. $book_id);
+            }
+
+            $purchased_book->status = 'archived';
+
+            $purchased_book->save();
         }
-
-        $purchased_book->status = 'archived';
-
-        $purchased_book->save();
 
         return $this->formatResponse('success', null);
     }
@@ -175,20 +196,34 @@ class StoreController extends Controller
     {
         $user = Auth::user();
 
-        $purchased_book = PurchasedBook::where([
-            ['buyer_id', $user->id],
-            ['book_id', $request->book_id],
-        ])->get()->first();
+        foreach ($request->books as $book_id) {
+            $purchased_book = PurchasedBook::where([
+                ['buyer_id', $user->id],
+                ['book_id', $book_id],
+            ])->get()->first();
 
-        if ($purchased_book == null) {
-            return $this->formatResponse('success', 'book not found');
+            if ($purchased_book == null) {
+                return $this->formatResponse('error', 'book not found id: '. $book_id);
+            }
+
+            $purchased_book->status = 'available';
+
+            $purchased_book->save();
         }
 
-        $purchased_book->status = 'available';
-
-        $purchased_book->save();
-
         return $this->formatResponse('success', null);
+    }
+
+    public function listArchivedBooks()
+    {
+        $user = Auth::user();
+
+        $archived_books = PurchasedBook::where([
+            ['buyer_id', $user->id],
+            ['status', 'archived'],
+        ])->get();
+
+        return $this->formatResponse('success', null, $archived_books);
     }
 
     public function getListGenres()

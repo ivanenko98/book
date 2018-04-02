@@ -24,6 +24,8 @@ Route::get('/logout', 'Auth\LoginController@logout');
 Route::post('password/email', 'Auth\ForgotPasswordController@getResetToken');
 Route::post('password/reset', 'Auth\ResetPasswordController@reset');
 Route::post('user/reset-password', 'Auth\ResetPasswordController@userPasswordReset');
+Route::post('/reset-password-send-sms', 'Auth\ResetPasswordController@resetPasswordSendSMS');
+Route::post('/reset-password-from-sms', 'Auth\ResetPasswordController@resetPasswordFromSMS');
 
 /** FACEBOOK SOCIALITE */
 Route::get('login/facebook', 'Auth\LoginController@redirectToProvider');
@@ -32,6 +34,16 @@ Route::get('login/facebook/callback', 'Auth\LoginController@handleProviderCallba
 Route::group(['middleware' => 'auth:api'], function () {
 
     /** USER */
+    /** change password */
+    Route::post('/change-password', 'UserController@changePassword');
+    /** change name */
+    Route::post('/change-name', 'UserController@changeName');
+    /** send code for change phone */
+    Route::post('/send-change-phone', 'UserController@sendSMSForChangePhone');
+    /** change phone */
+    Route::post('/change-phone', 'UserController@changePhone');
+    /** upload image user */
+    Route::post('/image-user', 'UserController@uploadImage');
     /** get purchased books */
     Route::get('/purchased-books', 'StoreController@getPurchasedBooks');
     /** get sold books */
@@ -41,6 +53,10 @@ Route::group(['middleware' => 'auth:api'], function () {
     /** restore book */
     Route::post('/restore-book', 'StoreController@restoreBook');
 
+    /** list archived books */
+    Route::get('/list-archived-books', 'StoreController@listArchivedBooks');
+    /** show list books of store for translator */
+    Route::get('/get-books-in-store', 'UserController@getBooksInStore');
 
     /** BOOKS */
     /** show books list */
@@ -59,34 +75,13 @@ Route::group(['middleware' => 'auth:api'], function () {
     Route::post('/book-folder', 'BookController@updateFolder');
     /** show list books of folder */
     Route::get('/get-books/{folder}', 'BookController@getBooks');
-
-    /**
-     * search books
-     *
-     * parameters: keyword
-     */
+    /** search books */
     Route::post('/search-books', 'BookController@searchBooks');
-
-    /**
-     * list books
-     *
-     * parameters: genre_id
-     */
+    /** list books of genre */
     Route::post('/list-books', 'BookController@listBooks');
-
-    /**
-     * upload image book
-     *
-     * parameters: file
-     */
+    /** upload image book*/
     Route::post('/image-book', 'BookController@uploadImage');
 
-    /**
-     * upload image user
-     *
-     * parameters: file
-     */
-    Route::post('/image-user', 'UserController@uploadImage');
 
     /** FOLDERS */
     /** show folders list */
@@ -108,9 +103,14 @@ Route::group(['middleware' => 'auth:api'], function () {
     /** TRANSLATE */
     Route::post('/get-book',['as' => 'get_book', 'uses' => 'TranslateController@getBook']);
     Route::post('/translate',['as' => 'translate', 'uses' => 'TranslateController@translate']);
+    /** translating word using google translator */
     Route::post('/translate-word',['as' => 'translate', 'uses' => 'TranslateController@translateWord']);
-    Route::post('/load-page',['as' => 'load_page', 'uses' => 'TranslateController@loadPage']);
-
+    /** show all words of book as objects */
+    Route::post('/get-full-text',['as' => 'full-text', 'uses' => 'BookController@getFullText']);
+    /** show three pages (current_page, prev_page, next_page) */
+    Route::post('/load-page',['as' => 'load_page', 'uses' => 'BookController@loadPage']);
+    /** show list pages for book */
+    Route::post('/list-pages', 'BookController@listPages');
 
     /** REVIEWS */
     /** show reviews list for book */
@@ -136,4 +136,15 @@ Route::group(['middleware' => 'auth:api'], function () {
     Route::post('/buy-book', 'StoreController@buyBook');
     /** book to store */
     Route::post('/book-to-store', 'StoreController@bookToStore');
+
+
+    /** DICTIONARY */
+    /** list words */
+    Route::get('/list-words', 'DictionaryController@listWords');
+    /** add word to dictionary */
+    Route::post('/add-word', 'DictionaryController@addToDictionary');
+    /** remove word from dictionary */
+    Route::post('/remove-word', 'DictionaryController@removeFromDictionary');
+    /** search words */
+    Route::post('/search-words', 'DictionaryController@searchWords');
 });
