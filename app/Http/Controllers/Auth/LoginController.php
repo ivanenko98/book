@@ -42,12 +42,8 @@ class LoginController extends Controller
         $this->middleware('guest')->except('logout');
     }
 
-
-
     /**
      * Redirect the user to the Facebook authentication page.
-     *
-     * @return Response
      */
     public function redirectToProvider()
     {
@@ -56,8 +52,6 @@ class LoginController extends Controller
 
     /**
      * Obtain the user information from GitHub.
-     *
-     * @return Response
      */
     public function handleProviderCallback()
     {
