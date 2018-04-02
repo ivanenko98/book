@@ -24,15 +24,15 @@ class Book extends Model
         'genre_name',
         'pages',
         'rating',
-        'reviews',
+//        'reviews',
         'genre',
         'translator',
     ];
 
     protected $appends = [
-//        'pages',
+        'pages',
         'rating',
-        'reviews',
+//        'reviews',
         'genre',
         'translator',
     ];
@@ -75,16 +75,16 @@ class Book extends Model
 
     /** ATTRIBUTE */
 
-//    public function getPagesAttribute()
-//    {
-//        $pages = Page::where('book_id', $this->genre_id)->get();
-//
-//        if ($pages !== null) {
-//            return $pages->count();
-//        } else {
-//            return null;
-//        }
-//    }
+    public function getPagesAttribute()
+    {
+        $pages = Page::where('book_id', $this->id)->get();
+
+        if ($pages !== null) {
+            return $pages->count();
+        } else {
+            return null;
+        }
+    }
 
     public function getRatingAttribute()
     {
@@ -105,16 +105,16 @@ class Book extends Model
         }
     }
 
-    public function getReviewsAttribute()
-    {
-        $reviews = Review::where('book_id', $this->id)->get();
-
-        if ($reviews !== null) {
-            return $reviews;
-        } else {
-            return null;
-        }
-    }
+//    public function getReviewsAttribute()
+//    {
+//        $reviews = Review::where('book_id', $this->id)->get();
+//
+//        if ($reviews !== null) {
+//            return $reviews;
+//        } else {
+//            return null;
+//        }
+//    }
 
     public function getGenreAttribute()
     {

@@ -119,7 +119,8 @@ class StoreController extends Controller
             'buyer_id'            => 'required',
             'book_id'             => 'required',
             'seller_id'           => 'required',
-            'price'               => 'required',
+            'price'               => 'required_if: demonstration, 0',
+            'demonstration'       => 'required',
         ]);
 
         if ($validator->fails()){
@@ -128,15 +129,28 @@ class StoreController extends Controller
         }
 
         $purchased_book_db = PurchasedBook::where([
-            ['buyer_id', $request->buyer_id],
-            ['book_id', $request->book_id]
+            'buyer_id' => $request->buyer_id,
+            'book_id' => $request->book_id
         ])->get()->first();
 
         if ($purchased_book_db !== null) {
-            return $this->formatResponse('error', 'this book is already bought');
+            if ($purchased_book_db->status == 'demonstration') {
+                if ($request->demonstration == 1) {
+                    return $this->formatResponse('error', 'demo version book already buyed');
+                } else {
+                    $purchased_book_db->status = 'available';
+                    $purchased_book_db->price = $request->price;
+                    $purchased_book_db->save();
+                    return $this->formatResponse('success', null);
+                }
+            } else {
+                return $this->formatResponse('error', 'this book is already bought');
+            }
         }
 
         $book = Book::find($request->book_id);
+
+        $book->buyers = $book->buyers + 1;
 
         $book->save();
 
@@ -146,6 +160,10 @@ class StoreController extends Controller
         $purchased_book->seller_id = $request->seller_id;
         $purchased_book->book_id = $request->book_id;
         $purchased_book->price = $request->price;
+
+        if ($request->demonstration == 1) {
+            $purchased_book->status = 'demonstration';
+        }
 
         $purchased_book->save();
 
@@ -240,117 +258,5 @@ class StoreController extends Controller
 
         $response = $this->arrayResponse('success',null);
         return response($response, 200);
-    }
-
-    public function loadPage(Request $request){
-
-        $allPages = $this->allPages($request);
-
-        $keysPages = $this->keysPages($allPages);
-
-        $prev_page = $this->prevPage($keysPages, $request->book_id, $request->current_page);
-
-        $next_page = $this->nextPage($keysPages, $request->book_id, $request->current_page);
-
-        $current_page = Page::where([
-            'book_id' => $request->book_id,
-            'id' => $request->current_page
-        ])
-            ->get();
-
-
-        if ($prev_page != null) {
-            $pages['prev_page'] = $prev_page;
-        }
-
-        if ($current_page != null) {
-            $pages['current_page'] = $current_page;
-        }
-
-        if ($next_page != null) {
-            $pages['next_page'] = $next_page;
-        }
-
-        $bookArray = $this->bookArray($allPages);
-
-        return $bookArray;
-    }
-
-    private function allPages(Request $request){
-
-        $ifPages = Page::where([
-            'book_id' => $request->book_id,
-        ])
-            ->exists();
-
-        if ($ifPages == true){
-            $all_pages = Page::where([
-                'book_id' => $request->book_id,
-            ])
-                ->get();
-
-            return $all_pages;
-
-        } else {
-            return response()->json([
-                'Message' => 'This book does not exist.'
-            ]);
-        }
-
-    }
-
-    private function prevPage($keys_pages, $book_id, $current_page){
-
-        if ($keys_pages[0] !== $current_page){
-            if(isset($keys_pages)){
-                foreach ($keys_pages as $key_page) {
-
-                    if($key_page == $current_page){
-                        $id_prev_page = $keys_pages[array_search($key_page, $keys_pages) - 1];
-
-                        $prev_page = Page::where([
-                            'book_id' => $book_id,
-                            'id' => $id_prev_page
-                        ])
-                            ->get();
-
-                        return $prev_page;
-                    }
-                }
-            }
-        }else{
-            return null;
-        }
-    }
-
-    private function nextPage($keys_pages, $book_id, $current_page){
-
-        if (end($keys_pages)!== $current_page){
-            if(isset($keys_pages)){
-                foreach ($keys_pages as $key_page) {
-
-                    if($key_page == $current_page){
-                        $id_next_page = $keys_pages[array_search($key_page, $keys_pages) + 1];
-
-                        $next_page = Page::where([
-                            'book_id' => $book_id,
-                            'id' => $id_next_page
-                        ])
-                            ->get();
-
-                        return $next_page;
-                    }
-                }
-            }
-        }else{
-            return null;
-        }
-    }
-
-    private function keysPages($allPages){
-        foreach ($allPages as $item) {
-            $this->keys_pages[] = $item->id;
-        }
-        return $this->keys_pages;
     }
 }
