@@ -116,10 +116,7 @@ class StoreController extends Controller
     public function buyBook(Request $request)
     {
         $validator = Validator::make($request->all(),[
-            'buyer_id'            => 'required',
             'book_id'             => 'required',
-            'seller_id'           => 'required',
-            'price'               => 'required_if: demonstration, 0',
             'demonstration'       => 'required',
         ]);
 
@@ -133,13 +130,15 @@ class StoreController extends Controller
             'book_id' => $request->book_id
         ])->get()->first();
 
+        $book = Book::find($request->book_id);
+
         if ($purchased_book_db !== null) {
             if ($purchased_book_db->status == 'demonstration') {
                 if ($request->demonstration == 1) {
                     return $this->formatResponse('error', 'demo version book already buyed');
                 } else {
                     $purchased_book_db->status = 'available';
-                    $purchased_book_db->price = $request->price;
+                    $purchased_book_db->price = $book->price;
                     $purchased_book_db->save();
                     return $this->formatResponse('success', null);
                 }
@@ -148,18 +147,16 @@ class StoreController extends Controller
             }
         }
 
-        $book = Book::find($request->book_id);
-
         $book->buyers = $book->buyers + 1;
 
         $book->save();
 
         $purchased_book = new PurchasedBook();
 
-        $purchased_book->buyer_id = $request->buyer_id;
-        $purchased_book->seller_id = $request->seller_id;
+        $purchased_book->buyer_id = Auth::user()->id;
+        $purchased_book->seller_id = $book->user_id;
         $purchased_book->book_id = $request->book_id;
-        $purchased_book->price = $request->price;
+        $purchased_book->price = $book->price;
 
         if ($request->demonstration == 1) {
             $purchased_book->status = 'demonstration';
@@ -234,8 +231,9 @@ class StoreController extends Controller
 
     public function bookToStore(Request $request)
     {
-        $validator = Validator::make($request->all(),[
+        $validator = Validator::make($request->all(), [
             'book_id'             => 'required',
+            'price'               => 'required',
             'genre_id'            => 'required'
         ]);
 
@@ -252,6 +250,7 @@ class StoreController extends Controller
         }
 
         $book->store = 1;
+        $book->price = $request->price;
         $book->genre_id = $request->genre_id;
 
         $book->save();
