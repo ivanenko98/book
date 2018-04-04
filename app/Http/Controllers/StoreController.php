@@ -126,13 +126,14 @@ class StoreController extends Controller
         }
 
         $purchased_book_db = PurchasedBook::where([
-            'buyer_id' => $request->buyer_id,
+            'buyer_id' => Auth::user()->id,
             'book_id' => $request->book_id
         ])->get()->first();
 
         $book = Book::find($request->book_id);
-
+//        dd($purchased_book_db);
         if ($purchased_book_db !== null) {
+//            dd($purchased_book_db);
             if ($purchased_book_db->status == 'demonstration') {
                 if ($request->demonstration == 1) {
                     return $this->formatResponse('error', 'demo version book already buyed');
@@ -146,7 +147,7 @@ class StoreController extends Controller
                 return $this->formatResponse('error', 'this book is already bought');
             }
         }
-
+//        dd();
         $book->buyers = $book->buyers + 1;
 
         $book->save();
