@@ -24,15 +24,13 @@ class Book extends Model
         'genre_name',
         'pages',
         'rating',
-//        'reviews',
         'genre',
         'translator',
     ];
 
     protected $appends = [
-        'pages',
+        'pages_count',
         'rating',
-//        'reviews',
         'genre',
         'translator',
     ];
@@ -48,16 +46,6 @@ class Book extends Model
     public function pages(){
         return $this->hasMany(Page::class);
     }
-
-    protected static function boot() {
-
-        parent::boot();
-        static::deleting(function($book) {
-            $book->pages()->delete();
-            $book->reviews()->delete();
-        });
-    }
-
 
     public function purchases()
     {
@@ -75,7 +63,7 @@ class Book extends Model
 
     /** ATTRIBUTE */
 
-    public function getPagesAttribute()
+    public function getPagesCountAttribute()
     {
         $pages = Page::where('book_id', $this->id)->get();
 
@@ -105,17 +93,6 @@ class Book extends Model
         }
     }
 
-//    public function getReviewsAttribute()
-//    {
-//        $reviews = Review::where('book_id', $this->id)->get();
-//
-//        if ($reviews !== null) {
-//            return $reviews;
-//        } else {
-//            return null;
-//        }
-//    }
-
     public function getGenreAttribute()
     {
         $genre = Genre::find($this->genre_id);
@@ -136,5 +113,14 @@ class Book extends Model
         } else {
             return null;
         }
+    }
+
+    protected static function boot() {
+
+        parent::boot();
+        static::deleting(function($book) {
+            $book->pages()->delete();
+            $book->reviews()->delete();
+        });
     }
 }
