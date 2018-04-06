@@ -32,6 +32,13 @@ class BookController extends Controller
         return response()->json($books, 200);
     }
 
+    public function getBooks(Folder $folder)
+    {
+        $books = Book::where('folder_id', $folder->id)->get();
+
+        return response()->json($books, 200);
+    }
+
     /**
      * Store a newly created resource in storage.
      *
