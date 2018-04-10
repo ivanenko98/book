@@ -141,7 +141,7 @@ class UploadController extends Controller
     public function cutToPages($text, $book){
         preg_match_all("/.*?[.?!](?:\s|$)/s", $text, $items);
 
-        $n = 10800;
+        $n = 7700;
         foreach ($items[0] as $item){
             if (!isset($page)){
                 $page = $item;
