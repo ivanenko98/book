@@ -114,7 +114,7 @@ trait Translate
                             'book_id' => $book_id,
                             'id' => $id_prev_page
                         ])
-                            ->get();
+                            ->first();
 
                         return $prev_page;
                     }
@@ -138,7 +138,7 @@ trait Translate
                             'book_id' => $book_id,
                             'id' => $id_next_page
                         ])
-                            ->get();
+                            ->first();
 
                         return $next_page;
                     }
