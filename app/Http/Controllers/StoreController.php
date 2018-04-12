@@ -39,15 +39,14 @@ class StoreController extends Controller
 
         $recommended_books = [];
 
-        if ($purchased_books->count() > 0) {
 
+        if ($purchased_books->count() > 0) {
 
             while (collect($recommended_books)->count() < $this->number) {
 
                 $genres = [];
 
                 foreach ($purchased_books as $purchased_book) {
-
                     if (!in_array($purchased_book->book->genre_id, $genres)) {
                         $genres[] = $purchased_book->book->genre_id;
                     }
@@ -55,13 +54,13 @@ class StoreController extends Controller
 
                 foreach ($genres as $genre_id) {
                     $books = Book::where(
-                        ['genre_id', $genre_id],
-                        ['store', 1]
+                        ['genre_id' => $genre_id],
+                        ['store' => 1]
                     )->orderBy('buyers', 'desc')->get();
 
                     if ($books->count() > 0) {
 
-                        $recommended_book = $books->first(function ($book, $key) use ($recommended_books) {
+                        $recommended_book = $books->first(function ($book) use ($recommended_books) {
                             if (collect($recommended_books)->contains('id', $book->id) == false) {
                                 return true;
                             } else {
@@ -72,7 +71,6 @@ class StoreController extends Controller
                         if ($recommended_book !== null) {
                             $recommended_books[] = $recommended_book;
                         }
-
 
                         if (collect($recommended_books)->count() >= $this->number) {
                             return $this->formatResponse('success', null, collect($recommended_books));
