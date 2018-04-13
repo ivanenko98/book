@@ -13,7 +13,7 @@ use Illuminate\Support\Facades\Validator;
 
 class StoreController extends Controller
 {
-    public $number = 10;
+    const NUMBER = 10;
 
     public function getPopularBooks()
     {
@@ -33,7 +33,7 @@ class StoreController extends Controller
 
         $books = Book::where('store', 1)->get();
 
-        if ($books->count() <= $this->number) {
+        if ($books->count() <= self::NUMBER) {
             return $this->formatResponse('success', null, $books);
         }
 
@@ -42,7 +42,7 @@ class StoreController extends Controller
 
         if ($purchased_books->count() > 0) {
 
-            while (collect($recommended_books)->count() < $this->number) {
+            while (collect($recommended_books)->count() < self::NUMBER) {
 
                 $genres = [];
 
@@ -50,6 +50,19 @@ class StoreController extends Controller
                     if (!in_array($purchased_book->book->genre_id, $genres)) {
                         $genres[] = $purchased_book->book->genre_id;
                     }
+                }
+
+                $books = Book::whereIn('genre_id', $genres)->get();
+
+                if ($books->count() < self::NUMBER) {
+
+                    $other_books = Book::whereNotIn('genre_id', $genres)
+                        ->take(self::NUMBER - $books->count())
+                        ->get();
+
+                    $books = $books->merge($other_books);
+
+                    return $this->formatResponse('success', null, $books);
                 }
 
                 foreach ($genres as $genre_id) {
@@ -72,7 +85,7 @@ class StoreController extends Controller
                             $recommended_books[] = $recommended_book;
                         }
 
-                        if (collect($recommended_books)->count() >= $this->number) {
+                        if (collect($recommended_books)->count() >= self::NUMBER) {
                             return $this->formatResponse('success', null, collect($recommended_books));
                         }
                     }
