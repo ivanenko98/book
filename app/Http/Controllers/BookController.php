@@ -12,6 +12,7 @@ use App\Review;
 use App\Traits\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Storage;
 
 class BookController extends Controller
@@ -106,7 +107,7 @@ class BookController extends Controller
     /**
      * Remove the specified resource from storage.
      *
-     * @param Request $request
+     * @param  int  $id
      * @return \Illuminate\Http\Response
      */
     public function destroy(Request $request)
@@ -194,7 +195,7 @@ class BookController extends Controller
         $purchased_book = $user->purchasedBooks->where('book_id', $request->book_id)->first();
 
         if ($purchased_book !== null && $purchased_book->status == 'demonstration') {
-            $allPages = $purchased_book->book->pages->take(self::DEMONSTRATION_PAGES);
+            $allPages = $purchased_book->book->pages->take(Config::get('constants.demonstration_pages'));
         } else {
             $allPages = $this->allPages($request);
         }
@@ -210,7 +211,7 @@ class BookController extends Controller
         $purchased_book = $user->purchasedBooks->where('book_id', $request->book_id)->first();
 
         if ($purchased_book !== null && $purchased_book->status == 'demonstration') {
-            $allPages = $purchased_book->book->pages->take(self::DEMONSTRATION_PAGES);
+            $allPages = $purchased_book->book->pages->take(Config::get('constants.demonstration_pages'));
         } else {
             $allPages = $this->allPages($request);
         }

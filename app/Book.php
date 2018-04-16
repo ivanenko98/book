@@ -3,6 +3,8 @@
 namespace App;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Storage;
 
 class Book extends Model
@@ -66,6 +68,16 @@ class Book extends Model
 
     public function getPagesCountAttribute()
     {
+        $user = Auth::user();
+
+        $purchased_book = $this->purchases()->where('buyer_id', $user->id)->first();
+
+        if ($purchased_book != null) {
+            if ($purchased_book->status == 'demonstration') {
+                return Config::get('constants.demonstration_pages');
+            }
+        }
+
         $pages = Page::where('book_id', $this->id)->get();
 
         if ($pages !== null) {
