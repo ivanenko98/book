@@ -31,7 +31,8 @@ class FolderController extends Controller
             ];
         }
 
-        return response()->json($this->data, 200);
+        $response = $this->formatResponse('success', null, $this->data);
+        return response($response, 200);
     }
 
     /**
@@ -43,7 +44,9 @@ class FolderController extends Controller
     public function store(Request $request)
     {
         $folder = Folder::create($request->all());
-        return response()->json($folder, 201);
+
+        $response = $this->formatResponse('success', null, $folder);
+        return response($response, 200);
     }
 
     /**
@@ -54,7 +57,9 @@ class FolderController extends Controller
     public function show(Folder $folder)
     {
         $folder = Folder::find($folder->id);
-        return response()->json($folder, 200);
+
+        $response = $this->formatResponse('success', null, $folder);
+        return response($response, 200);
     }
 
     /**
@@ -67,13 +72,14 @@ class FolderController extends Controller
     public function update(Request $request, Folder $folder)
     {
         $folder->update($request->all());
-        return response()->json($folder, 200);
+
+        $response = $this->formatResponse('success', null, $folder);
+        return response($response, 200);
     }
 
     /**
      * Remove the specified resource from storage.
      *
-     * @param  int  $id
      * @return \Illuminate\Http\Response
      */
     public function destroy(Folder $folder)
@@ -88,13 +94,11 @@ class FolderController extends Controller
                     'msg' => 'Deleted'
                 ], 200);
             }
-            return response()->json([
-                'msg' => 'This folder does not exist'
-            ]);
+            $response = $this->formatResponse('error', 'This folder does not exist');
+            return response($response, 200);
         }
-        return response()->json([
-        'msg' => 'You cannot delete this folder'
-    ]);
+        $response = $this->formatResponse('error', 'You cannot delete this folder');
+        return response($response, 200);
     }
 
     public function defaultFolder($user_id){

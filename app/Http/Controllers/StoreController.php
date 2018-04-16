@@ -19,7 +19,8 @@ class StoreController extends Controller
     {
         $books = Book::where('store', 1)->orderBy('buyers', 'desc')->limit(10)->get();
 
-        return $this->formatResponse('success', null, $books);
+        $response = $this->formatResponse('success', null, $books);
+        return response($response, 200);
     }
 
     /**
@@ -34,7 +35,8 @@ class StoreController extends Controller
         $books = Book::where('store', 1)->get();
 
         if ($books->count() <= self::NUMBER) {
-            return $this->formatResponse('success', null, $books);
+            $response = $this->formatResponse('success', null, $books);
+            return response($response, 200);
         }
 
         $recommended_books = [];
@@ -62,7 +64,8 @@ class StoreController extends Controller
 
                     $books = $books->merge($other_books);
 
-                    return $this->formatResponse('success', null, $books);
+                    $response = $this->formatResponse('success', null, $books);
+                    return response($response, 200);
                 }
 
                 foreach ($genres as $genre_id) {
@@ -86,24 +89,28 @@ class StoreController extends Controller
                         }
 
                         if (collect($recommended_books)->count() >= self::NUMBER) {
-                            return $this->formatResponse('success', null, collect($recommended_books));
+                            $response = $this->formatResponse('success', null, collect($recommended_books));
+                            return response($response, 200);
                         }
                     }
                 }
             }
         } else {
             $books = Book::where('store', 1)->orderBy('buyers', 'desc')->limit(10)->get();
-            return $this->formatResponse('success', null, $books);
+            $response = $this->formatResponse('success', null, $books);
+            return response($response, 200);
         }
 
-        return $this->formatResponse('success', null, collect($recommended_books));
+        $response = $this->formatResponse('success', null, collect($recommended_books));
+        return response($response, 200);
     }
 
     public function getNewBooks()
     {
         $books = Book::where('store', 1)->orderBy('created_at', 'desc')->limit(10)->get();
 
-        return $this->formatResponse('success', null, $books);
+        $response = $this->formatResponse('success', null, $books);
+        return response($response, 200);
     }
 
     public function getSoldBooks()
@@ -112,7 +119,8 @@ class StoreController extends Controller
 
         $purchased_books = $user->soldBooks;
 
-        return $this->formatResponse('success', null, $purchased_books);
+        $response = $this->formatResponse('success', null, $purchased_books);
+        return response($response, 200);
     }
 
     public function getPurchasedBooks()
@@ -121,7 +129,8 @@ class StoreController extends Controller
 
         $purchased_books = $user->purchasedBooks->where('status', ['available', 'demonstration']);
 
-        return $this->formatResponse('success', null, $purchased_books);
+        $response = $this->formatResponse('success', null, $purchased_books);
+        return response($response, 200);
     }
 
     public function buyBook(Request $request)
@@ -132,7 +141,7 @@ class StoreController extends Controller
         ]);
 
         if ($validator->fails()){
-            $response = $this->arrayResponse('error','incorrect data', $validator->errors());
+            $response = $this->formatResponse('error','incorrect data', $validator->errors());
             return response($response, 200);
         }
 
@@ -142,23 +151,25 @@ class StoreController extends Controller
         ])->get()->first();
 
         $book = Book::find($request->book_id);
-//        dd($purchased_book_db);
         if ($purchased_book_db !== null) {
-//            dd($purchased_book_db);
             if ($purchased_book_db->status == 'demonstration') {
                 if ($request->demonstration == 1) {
-                    return $this->formatResponse('error', 'demo version book already buyed');
+                    $response = $this->formatResponse('error', 'demo version book already buyed');
+                    return response($response, 200);
                 } else {
                     $purchased_book_db->status = 'available';
                     $purchased_book_db->price = $book->price;
                     $purchased_book_db->save();
-                    return $this->formatResponse('success', null);
+
+                    $response = $this->formatResponse('success');
+                    return response($response, 200);
                 }
             } else {
-                return $this->formatResponse('error', 'this book is already bought');
+                $response = $this->formatResponse('error', 'this book is already bought');
+                return response($response, 200);
             }
         }
-//        dd();
+
         $book->buyers = $book->buyers + 1;
 
         $book->save();
@@ -176,7 +187,8 @@ class StoreController extends Controller
 
         $purchased_book->save();
 
-        return $this->formatResponse('success', null);
+        $response = $this->formatResponse('success');
+        return response($response, 200);
     }
 
     public function archivingBook(Request $request)
@@ -190,7 +202,8 @@ class StoreController extends Controller
             ])->get()->first();
 
             if ($purchased_book == null) {
-                return $this->formatResponse('error', 'book not found id: '. $book_id);
+                $response = $this->formatResponse('error', 'book not found id: '. $book_id);
+                return response($response, 200);
             }
 
             $purchased_book->status = 'archived';
@@ -198,7 +211,8 @@ class StoreController extends Controller
             $purchased_book->save();
         }
 
-        return $this->formatResponse('success', null);
+        $response = $this->formatResponse('success');
+        return response($response, 200);
     }
 
     public function restoreBook(Request $request)
@@ -212,7 +226,8 @@ class StoreController extends Controller
             ])->get()->first();
 
             if ($purchased_book == null) {
-                return $this->formatResponse('error', 'book not found id: '. $book_id);
+                $response = $this->formatResponse('error', 'book not found id: '. $book_id);
+                return response($response, 200);
             }
 
             $purchased_book->status = 'available';
@@ -220,7 +235,8 @@ class StoreController extends Controller
             $purchased_book->save();
         }
 
-        return $this->formatResponse('success', null);
+        $response = $this->formatResponse('success');
+        return response($response, 200);
     }
 
     public function listArchivedBooks()
@@ -232,13 +248,16 @@ class StoreController extends Controller
             ['status', 'archived'],
         ])->get();
 
-        return $this->formatResponse('success', null, $archived_books);
+        $response = $this->formatResponse('success', null, $archived_books);
+        return response($response, 200);
     }
 
     public function getListGenres()
     {
         $genres = Genre::all();
-        return $this->formatResponse('success', null, $genres);
+
+        $response = $this->formatResponse('success', null, $genres);
+        return response($response, 200);
     }
 
     public function bookToStore(Request $request)
@@ -250,14 +269,14 @@ class StoreController extends Controller
         ]);
 
         if ($validator->fails()){
-            $response = $this->arrayResponse('error','incorrect data', $validator->errors());
+            $response = $this->formatResponse('error','incorrect data', $validator->errors());
             return response($response, 200);
         }
 
         $book = Book::find($request->book_id);
 
         if ($book == null) {
-            $response = $this->arrayResponse('error','book not found');
+            $response = $this->formatResponse('error','book not found');
             return response($response, 200);
         }
 
@@ -267,7 +286,7 @@ class StoreController extends Controller
 
         $book->save();
 
-        $response = $this->arrayResponse('success',null);
+        $response = $this->formatResponse('success',null);
         return response($response, 200);
     }
 }

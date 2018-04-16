@@ -17,7 +17,7 @@ class ReviewController extends Controller
             ['content', '!=', ['', null]],
         ])->get();
 
-        $response = $this->arrayResponse('success', null, $reviews);
+        $response = $this->formatResponse('success', null, $reviews);
         return response($response, 200);
     }
 
@@ -49,7 +49,8 @@ class ReviewController extends Controller
 
         $review = Review::create($data);
 
-        return response()->json($review, 200);
+        $response = $this->formatResponse('success', null, $review);
+        return response($response, 200);
     }
 
     /**
@@ -62,7 +63,9 @@ class ReviewController extends Controller
     public function update(Request $request, Review $review)
     {
         $review->update($request->only(['rating', 'content']));
-        return response()->json($review, 200);
+
+        $response = $this->formatResponse('success', null, $review);
+        return response($response, 200);
     }
 
     /**
@@ -75,6 +78,8 @@ class ReviewController extends Controller
     public function destroy(Review $review)
     {
         $review->delete();
-        return response()->json('deleted', 200);
+
+        $response = $this->formatResponse('success');
+        return response($response, 200);
     }
 }

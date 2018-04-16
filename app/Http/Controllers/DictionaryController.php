@@ -16,7 +16,7 @@ class DictionaryController extends Controller
 
         $words = DictionaryEN_UA::where('user_id', $user->id)->get();
 
-        $response = $this->arrayResponse('success', null, $words);
+        $response = $this->formatResponse('success', null, $words);
         return response($response, 200);
     }
 
@@ -49,7 +49,7 @@ class DictionaryController extends Controller
         ])->first();
 
         if ($word_relation !== null) {
-            $response = $this->arrayResponse('error', 'translation is already added');
+            $response = $this->formatResponse('error', 'translation is already added');
             return response($response, 200);
         }
 
@@ -59,7 +59,7 @@ class DictionaryController extends Controller
         $word_relation->user_id = $user->id;
         $word_relation->save();
 
-        $response = $this->arrayResponse('success', null);
+        $response = $this->formatResponse('success', null);
         return response($response, 200);
     }
 
@@ -68,14 +68,14 @@ class DictionaryController extends Controller
         $word = DictionaryEN::where('word', $request->word)->first();
 
         if ($word == null) {
-            $response = $this->arrayResponse('error', 'translation not found');
+            $response = $this->formatResponse('error', 'translation not found');
             return response($response, 200);
         }
 
         $word_translate = DictionaryUA::where('word', $request->word_translate)->first();
 
         if ($word_translate == null) {
-            $response = $this->arrayResponse('error', 'translation not found');
+            $response = $this->formatResponse('error', 'translation not found');
             return response($response, 200);
         }
 
@@ -85,14 +85,14 @@ class DictionaryController extends Controller
         ])->first();
 
         if ($word_relation == null) {
-            $response = $this->arrayResponse('error', 'translation not found');
+            $response = $this->formatResponse('error', 'translation not found');
             return response($response, 200);
         } else {
             $word_relation->delete();
             $word->delete();
             $word_translate->delete();
 
-            $response = $this->arrayResponse('success', null);
+            $response = $this->formatResponse('success', null);
             return response($response, 200);
         }
     }
@@ -158,7 +158,7 @@ class DictionaryController extends Controller
 ////                });
 ////        })->orderBy('id', 'desc')->get();
 //
-//        $response = $this->arrayResponse('success', null, $words1);
+//        $response = $this->formatResponse('success', null, $words1);
 //        return response($response, 200);
     }
 }

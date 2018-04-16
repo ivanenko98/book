@@ -30,14 +30,16 @@ class BookController extends Controller
         $user = Auth::user();
         $books = Book::where('user_id', $user->id)->get();
 
-        return response()->json($books, 200);
+        $response = $this->formatResponse('success', $books);
+        return response($response, 200);
     }
 
     public function getBooks(Folder $folder)
     {
         $books = Book::where('folder_id', $folder->id)->get();
 
-        return response()->json($books, 200);
+        $response = $this->formatResponse('success', $books);
+        return response($response, 200);
     }
 
     /**
@@ -49,7 +51,9 @@ class BookController extends Controller
     public function store(Request $request)
     {
         $book = Book::create($request->except('percent'));
-        return response()->json($book, 200);
+
+        $response = $this->formatResponse('success', $book);
+        return response($response, 200);
     }
 
     /**
@@ -63,7 +67,9 @@ class BookController extends Controller
     public function show(Book $book)
     {
         $book = Book::find($book->id);
-        return response()->json($book, 200);
+
+        $response = $this->formatResponse('success', $book);
+        return response($response, 200);
     }
 
     /**
@@ -75,7 +81,9 @@ class BookController extends Controller
     public function update(Request $request, Book $book)
     {
         $book->update($request->all());
-        return response()->json($book, 200);
+
+        $response = $this->formatResponse('success', $book);
+        return response($response, 200);
     }
 
     public function updateFolder(Request $request){
@@ -88,19 +96,17 @@ class BookController extends Controller
             $ifBook = Book::where('id', $bookId)->get()->first();
             if (!$ifBook == null){
                 Book::where('id', $bookId)->update(['folder_id' => $newFolderId]);
-                return response()->json([
-                    "Book was added to " . $folderName . " folder successfully"
-                ], 200);
+
+                $response = $this->formatResponse('success', 'Book was added to ' . $folderName . 'folder successfully');
+                return response($response, 200);
             } else {
-                return response()->json([
-                    "Book does not exist"
-                ]);
+                $response = $this->formatResponse('success', 'Book does not exist');
+                return response($response, 200);
             }
         }
 
-       return response()->json([
-            "Folder was updated successfully"
-        ], 200);
+        $response = $this->formatResponse('success', 'Folder was updated successfully');
+        return response($response, 200);
     }
 
 
@@ -121,11 +127,13 @@ class BookController extends Controller
             if ($this->ifUser($book) == true){
                 $book->delete();
             } else {
-                dd('error');
+                $response = $this->formatResponse('error');
+                return response($response, 200);
             }
         }
-        return response()->json(['success'=>"Products Deleted successfully."]);
 
+        $response = $this->formatResponse('success', 'Products Deleted successfully');
+        return response($response, 200);
     }
 
     public function searchBooks(Request $request)
@@ -137,7 +145,7 @@ class BookController extends Controller
                 ->orWhere('author', 'like', "%{$keyword}%");
         })->orderBy('id', 'desc')->get();
 
-        $response = $this->arrayResponse('success', null, $books);
+        $response = $this->formatResponse('success', null, $books);
         return response($response, 200);
     }
 
@@ -149,7 +157,7 @@ class BookController extends Controller
     {
         $books = Book::where('genre_id', $request->genre_id)->get();
 
-        $response = $this->arrayResponse('success', null, $books);
+        $response = $this->formatResponse('success', null, $books);
         return response($response, 200);
     }
 
@@ -158,7 +166,7 @@ class BookController extends Controller
         $book = Book::find($request->book_id);
 
         if ($book == null) {
-            $response = $this->arrayResponse('error', 'book not found');
+            $response = $this->formatResponse('error', 'book not found');
             return response($response, 200);
         }
 
@@ -170,12 +178,10 @@ class BookController extends Controller
 
         Storage::disk('custom')->putFileAs('', $request->image, $imageName);
 
-//        dd(Storage::disk('public')->url($imageName));
-
         $book->image = $imageName;
         $book->save();
 
-        $response = $this->arrayResponse('success', null);
+        $response = $this->formatResponse('success', null);
         return response($response, 200);
     }
 
@@ -200,7 +206,7 @@ class BookController extends Controller
             $allPages = $this->allPages($request);
         }
 
-        $response = $this->arrayResponse('success', null, $allPages);
+        $response = $this->formatResponse('success', null, $allPages);
         return response($response, 200);
     }
 
@@ -241,7 +247,7 @@ class BookController extends Controller
             $pages['next_page'] = $next_page;
         }
 
-        $response = $this->arrayResponse('success', null, $pages);
+        $response = $this->formatResponse('success', null, $pages);
         return response($response, 200);
     }
 }

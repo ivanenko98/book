@@ -10,11 +10,4 @@ use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 class Controller extends BaseController
 {
     use AuthorizesRequests, DispatchesJobs, ValidatesRequests, FormatResponse, User;
-    public function arrayResponse($status, $message = null, $data = null){
-        $response = array();
-        $response['status']     = $status;
-        $response['message']    = $message;
-        $response['data']       = $data;
-        return $response;
-    }
 }
