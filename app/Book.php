@@ -122,6 +122,7 @@ class Book extends Model
         static::deleting(function($book) {
             $book->pages()->delete();
             $book->reviews()->delete();
+            $book->purchases()->delete();
         });
     }
 }
