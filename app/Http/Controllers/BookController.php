@@ -30,7 +30,7 @@ class BookController extends Controller
         $user = Auth::user();
         $books = Book::where('user_id', $user->id)->get();
 
-        $response = $this->formatResponse('success', $books);
+        $response = $this->formatResponse('success', null, $books);
         return response($response, 200);
     }
 
@@ -38,7 +38,7 @@ class BookController extends Controller
     {
         $books = Book::where('folder_id', $folder->id)->get();
 
-        $response = $this->formatResponse('success', $books);
+        $response = $this->formatResponse('success', null, $books);
         return response($response, 200);
     }
 
@@ -52,7 +52,7 @@ class BookController extends Controller
     {
         $book = Book::create($request->except('percent'));
 
-        $response = $this->formatResponse('success', $book);
+        $response = $this->formatResponse('success', null, $book);
         return response($response, 200);
     }
 
@@ -68,7 +68,7 @@ class BookController extends Controller
     {
         $book = Book::find($book->id);
 
-        $response = $this->formatResponse('success', $book);
+        $response = $this->formatResponse('success', null, $book);
         return response($response, 200);
     }
 
@@ -82,7 +82,7 @@ class BookController extends Controller
     {
         $book->update($request->all());
 
-        $response = $this->formatResponse('success', $book);
+        $response = $this->formatResponse('success', null, $book);
         return response($response, 200);
     }
 
