@@ -127,7 +127,7 @@ class StoreController extends Controller
     {
         $user = Auth::user();
 
-        $purchased_books = $user->purchasedBooks()->where('status', ['available', 'demonstration'])->get();
+        $purchased_books = $user->purchasedBooks()->whereIn('status', ['available', 'demonstration'])->get();
 
         $response = $this->formatResponse('success', null, $purchased_books);
         return response($response, 200);
