@@ -15,6 +15,8 @@ class StoreController extends Controller
 {
     const NUMBER = 10;
 
+    protected $books = array();
+
     public function getPopularBooks()
     {
         $books = Book::where('store', 1)->orderBy('buyers', 'desc')->limit(10)->get();
@@ -129,7 +131,11 @@ class StoreController extends Controller
 
         $purchased_books = $user->purchasedBooks()->whereIn('status', ['available', 'demonstration'])->get();
 
-        $response = $this->formatResponse('success', null, $purchased_books);
+        foreach ($purchased_books as $purchased_book) {
+            $this->books[] = $purchased_book->book;
+        }
+
+        $response = $this->formatResponse('success', null, $this->books);
         return response($response, 200);
     }
 
