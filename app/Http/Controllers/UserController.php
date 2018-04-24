@@ -20,7 +20,7 @@ class UserController extends Controller
         $user = Auth::user();
 
         if ($user == null) {
-            $response = $this->arrayResponse('error', 'user not found');
+            $response = $this->formatResponse('error', 'user not found');
             return response($response, 200);
         }
 
@@ -35,7 +35,7 @@ class UserController extends Controller
         $user->image = $imageName;
         $user->save();
 
-        $response = $this->arrayResponse('success', null);
+        $response = $this->formatResponse('success', null);
         return response($response, 200);
     }
 
@@ -49,12 +49,12 @@ class UserController extends Controller
         ]);
 
         if ($validator->fails()){
-            $response = $this->arrayResponse('error','incorrect data', $validator->errors());
+            $response = $this->formatResponse('error','incorrect data', $validator->errors());
             return response($response, 200);
         }
 
         if (!Hash::check($request->old_password, $user->password)) {
-            $response = $this->arrayResponse('error','incorrect old password');
+            $response = $this->formatResponse('error','incorrect old password');
             return response($response, 200);
         }
 
@@ -62,7 +62,7 @@ class UserController extends Controller
 
         $user->save();
 
-        $response = $this->arrayResponse('success', null);
+        $response = $this->formatResponse('success', null);
         return response($response, 200);
     }
 
@@ -75,7 +75,7 @@ class UserController extends Controller
             ['store', 1]
         ])->get();
 
-        $response = $this->arrayResponse('success', null, $books);
+        $response = $this->formatResponse('success', null, $books);
         return response($response, 200);
     }
 
@@ -93,7 +93,7 @@ class UserController extends Controller
 
         $user->save();
 
-        $response = $this->arrayResponse('success', null, $user);
+        $response = $this->formatResponse('success', null, $user);
         return response($response, 200);
     }
 
@@ -104,7 +104,7 @@ class UserController extends Controller
         $phone_db = User::where('phone', $request->phone)->first();
 
         if ($phone_db !== null) {
-            $response = $this->arrayResponse('error','This number is already in use');
+            $response = $this->formatResponse('error','This number is already in use');
             return response($response, 200);
         }
 
@@ -135,7 +135,7 @@ class UserController extends Controller
             'text' => 'Your verification code: ' . $code
         ]);
 
-        $response = $this->arrayResponse('success',null);
+        $response = $this->formatResponse('success',null);
         return response($response, 200);
     }
 
@@ -146,12 +146,12 @@ class UserController extends Controller
         $request_sms = ChangePhoneRequest::where('code', $request->code)->first();
 
         if ($request_sms == null) {
-            $response = $this->arrayResponse('error','code invalid');
+            $response = $this->formatResponse('error','code invalid');
             return response($response, 200);
         }
 
         if ($user->id !== $request_sms->user_id) {
-            $response = $this->arrayResponse('error','This request is not yours');
+            $response = $this->formatResponse('error','This request is not yours');
             return response($response, 200);
         }
 
@@ -161,7 +161,7 @@ class UserController extends Controller
 
         $request_sms->delete();
 
-        $response = $this->arrayResponse('success',null);
+        $response = $this->formatResponse('success',null);
         return response($response, 200);
     }
 }

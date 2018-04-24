@@ -29,10 +29,8 @@ class UploadController extends Controller
         if ($request->hasFile('file')) {
             $request->file('file')->store('docs');
         } else {
-            return response()->json([
-                'status' => false,
-                'msg' => 'Error'
-            ]);
+            $response = $this->formatResponse('error','file not found');
+            return response($response, 200);
         }
 
         $this->filename = $request->file->hashName();
@@ -52,7 +50,8 @@ class UploadController extends Controller
             $this->cutToPages($text, $book);
         }
 
-        return response()->json($book, 200);
+        $response = $this->formatResponse('success',null, $book);
+        return response($response, 200);
     }
 
     function getExtension ($filename)

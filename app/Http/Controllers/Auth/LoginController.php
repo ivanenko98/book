@@ -61,7 +61,8 @@ class LoginController extends Controller
 
         Auth::login($findUser, true);
 
-        return ['status' => 200];
+        $response = $this->formatResponse('success');
+        return response($response, 200);
     }
 
     public function findOrCreateUser($facebookUser){
@@ -89,17 +90,15 @@ class LoginController extends Controller
             $user = $this->guard()->user();
             $user->generateToken(true);
 
-            $response = $this->arrayResponse('success',null, $user);
+            $response = $this->formatResponse('success', null, $user);
             return response($response, 200);
         } else {
-            return [
-                'status'=>false,
-                'msg' => $this->sendFailedPhoneLoginResponse($request)
-            ];
+            $response = $this->formatResponse('success', $this->sendFailedPhoneLoginResponse($request));
+            return response($response, 200);
         }
     }
 
-    public function logout(Request $request)
+    public function logout()
     {
         $user = Auth::guard('api')->user();
 
@@ -108,6 +107,7 @@ class LoginController extends Controller
             $user->save();
         }
 
-        return ['status' => 200];
+        $response = $this->formatResponse('success', null, $user);
+        return response($response, 200);
     }
 }

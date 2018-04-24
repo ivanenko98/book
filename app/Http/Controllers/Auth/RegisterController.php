@@ -51,10 +51,7 @@ class RegisterController extends Controller
     {
         return Validator::make($data, [
             'name' => 'required|string|max:255',
-//            'surname' => 'required|string|max:255',
-//            'email' => 'required|string|email|max:255|unique:users',
             'phone' => 'required|string|max:25|unique:users',
-//            'password' => 'required|string|min:6|confirmed',
             'password' => 'required|string|min:6',
         ]);
     }
@@ -86,6 +83,7 @@ class RegisterController extends Controller
 
         $user->generateToken(true);
 
-        return response()->json($user, 200);
+        $response = $this->formatResponse('success', null, $user);
+        return response($response, 200);
     }
 }

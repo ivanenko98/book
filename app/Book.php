@@ -3,6 +3,8 @@
 namespace App;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Storage;
 
 class Book extends Model
@@ -24,6 +26,7 @@ class Book extends Model
         'updated_at',
         'genre_name',
         'pages_count',
+        'status',
         'rating',
         'genre',
         'translator',
@@ -34,6 +37,7 @@ class Book extends Model
         'rating',
         'genre',
         'translator',
+        'status',
     ];
 
     public function folder(){
@@ -66,6 +70,16 @@ class Book extends Model
 
     public function getPagesCountAttribute()
     {
+        $user = Auth::user();
+
+        $purchased_book = $this->purchases()->where('buyer_id', $user->id)->first();
+
+        if ($purchased_book != null) {
+            if ($purchased_book->status == 'demonstration') {
+                return Config::get('constants.demonstration_pages');
+            }
+        }
+
         $pages = Page::where('book_id', $this->id)->get();
 
         if ($pages !== null) {
@@ -73,6 +87,19 @@ class Book extends Model
         } else {
             return null;
         }
+    }
+
+    public function getStatusAttribute()
+    {
+        $user = Auth::user();
+
+        $purchased_book = $this->purchases()->where('buyer_id', $user->id)->first();
+
+        if ($purchased_book != null) {
+            return $purchased_book->status;
+        }
+
+        return null;
     }
 
     public function getRatingAttribute()
@@ -122,6 +149,7 @@ class Book extends Model
         static::deleting(function($book) {
             $book->pages()->delete();
             $book->reviews()->delete();
+            $book->purchases()->delete();
         });
     }
 }

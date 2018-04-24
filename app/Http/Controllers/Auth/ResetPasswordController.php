@@ -80,7 +80,9 @@ class ResetPasswordController extends Controller
         $user->update([
             'password' => bcrypt($request->get('password'))
         ]);
-        return response()->json(['status'=>true,'message'=>'Password was updated successfully','data'=>$user]);
+
+        $response = $this->formatResponse('success', 'Password was updated successfully', $user);
+        return response($response, 200);
     }
 
     public function resetPasswordSendSMS(Request $request)
@@ -113,7 +115,7 @@ class ResetPasswordController extends Controller
             'text' => 'Your verification code: ' . $code
         ]);
 
-        $response = $this->arrayResponse('success',null);
+        $response = $this->formatResponse('success');
         return response($response, 200);
     }
 
@@ -122,7 +124,7 @@ class ResetPasswordController extends Controller
         $request_sms = ResetPasswordSMSRequest::where('code', $request->code)->first();
 
         if ($request_sms == null) {
-            $response = $this->arrayResponse('error','code invalid');
+            $response = $this->formatResponse('error','code invalid');
             return response($response, 200);
         }
 
@@ -134,7 +136,7 @@ class ResetPasswordController extends Controller
 
         $request_sms->delete();
 
-        $response = $this->arrayResponse('success',null);
+        $response = $this->formatResponse('success');
         return response($response, 200);
     }
 
@@ -143,10 +145,10 @@ class ResetPasswordController extends Controller
         $request_sms = ResetPasswordSMSRequest::where('code', $request->code)->first();
 
         if ($request_sms == null) {
-            $response = $this->arrayResponse('error','code invalid');
+            $response = $this->formatResponse('error', 'code invalid');
             return response($response, 200);
         } else {
-            $response = $this->arrayResponse('success',null);
+            $response = $this->formatResponse('success');
             return response($response, 200);
         }
     }
