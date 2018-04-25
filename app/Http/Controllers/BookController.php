@@ -117,7 +117,8 @@ class BookController extends Controller
      */
     public function destroy(Request $request)
     {
-        $ids = $request->all();
+        $ids = $request->books_to_delete;
+
 
         foreach ($ids as $id) {
 
