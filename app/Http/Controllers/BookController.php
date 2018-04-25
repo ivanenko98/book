@@ -8,6 +8,7 @@ use App\Genre;
 use App\Http\Requests\ImageRequest;
 use App\Http\Traits\Translate;
 use App\Page;
+use App\PurchasedBook;
 use App\Review;
 use App\Traits\User;
 use Illuminate\Http\Request;
@@ -18,8 +19,6 @@ use Illuminate\Support\Facades\Storage;
 class BookController extends Controller
 {
     use Translate;
-
-    const DEMONSTRATION_PAGES = 10;
 
     public $ifBook;
 
@@ -248,6 +247,28 @@ class BookController extends Controller
         }
 
         $response = $this->formatResponse('success', null, $pages);
+        return response($response, 200);
+    }
+
+    public function saveCurrentPage(Request $request)
+    {
+        $user = Auth::user();
+
+        $purchased_book = PurchasedBook::where([
+            'book_id' => $request->book_id,
+            'buyer_id' => $user->id,
+        ])->first();
+
+        if ($purchased_book == null) {
+            $response = $this->formatResponse('error', 'Permission denied');
+            return response($response, 200);
+        }
+
+        $purchased_book->current_page = $request->current_page;
+
+        $purchased_book->save();
+
+        $response = $this->formatResponse('success');
         return response($response, 200);
     }
 }

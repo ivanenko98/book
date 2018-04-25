@@ -81,6 +81,8 @@ Route::group(['middleware' => 'auth:api'], function () {
     Route::post('/list-books', 'BookController@listBooks');
     /** upload image book*/
     Route::post('/image-book', 'BookController@uploadImage');
+    /** save current page*/
+    Route::post('/save-current-page', 'BookController@saveCurrentPage');
 
 
     /** FOLDERS */
