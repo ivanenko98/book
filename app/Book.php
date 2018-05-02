@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Storage;
 
 class Book extends Model
 {
+    protected static $books = array();
 
     protected $fillable = ['name', 'description', 'author', 'likes', 'percent', 'folder_id', 'user_id'];
 
@@ -141,6 +142,17 @@ class Book extends Model
         } else {
             return null;
         }
+    }
+
+    public static function purchasedBooks($user, $field = 'status', $values = ['available'])
+    {
+        $purchased_books = $user->purchasedBooks()->whereIn($field, $values)->get();
+
+        foreach ($purchased_books as $purchased_book) {
+            self::$books[] = $purchased_book->book;
+        }
+
+        return self::$books;
     }
 
     protected static function boot() {
