@@ -99,66 +99,66 @@ class DictionaryController extends Controller
 
     public function searchWords(Request $request)
     {
-//        $user = Auth::user();
-//
-//        $keyword = $request->keyword;
-//
-//        $word = new DictionaryEN();
-////
-////        $word->where([
-////            ['word', 'like', "%{$keyword}%"],
-////            ['user_id', $user->id]
-////        ]);
-////
-////        $word->whereHas('translateUa', function ($q) use ($keyword) {
-////            $q->where(function ($q) use ($keyword) {
-////                $q->where('word', 'like', "%{$keyword}%");
-////            });
-////        });
-//
-//
-////
-////        $words->whereHas('translateUa', function ($q) use ($keyword) {
-////            $q->where(function ($q) use ($keyword) {
-////                $q->where('word', 'like', "%{$keyword}%");
-////            });
-////        });
-////
-////        dd($words);
-//
-//        $words = $word->whereHas('translateUa', function ($q) use ($keyword) {
-//            $q->where(function ($q) use ($keyword) {
-//                $q->where('word', 'like', "%{$keyword}%");
-//            });
-//        })->orWhere('word', $keyword)->get();
-//
-////        dd($words);
-//
-//        foreach ($words as $word) {
-//            $words1[] = $word;
-//        }
-////
-//
-//
-////        foreach ($words as $items) {
-//////            dd($items);
-////            foreach ($items->translateUa as $item) {
-////                dd($item->word);
-////            }
-////        }
-//
-//
-//////
-////        $words = DictionaryEN::where(function ($q) use ($keyword) {
-////            $q->where('word', 'like', "%{$keyword}%")
-////                ->whereHasMany('translateUa', function ($q) use ($keyword) {
-////                    $q->where(function ($q) use ($keyword) {
-////                        $q->where('word', 'like', "%{$keyword}%");
-////                    });
-////                });
-////        })->orderBy('id', 'desc')->get();
-//
-//        $response = $this->formatResponse('success', null, $words1);
-//        return response($response, 200);
+        $user = Auth::user();
+
+        $keyword = $request->keyword;
+
+        $word = new DictionaryEN();
+
+        $word->where([
+            ['word', 'like', "%{$keyword}%"],
+            ['user_id', $user->id]
+        ]);
+
+        $word->whereHas('translateUa', function ($q) use ($keyword) {
+            $q->where(function ($q) use ($keyword) {
+                $q->where('word', 'like', "%{$keyword}%");
+            });
+        });
+
+
+
+        $words->whereHas('translateUa', function ($q) use ($keyword) {
+            $q->where(function ($q) use ($keyword) {
+                $q->where('word', 'like', "%{$keyword}%");
+            });
+        });
+
+        dd($words);
+
+        $words = $word->whereHas('translateUa', function ($q) use ($keyword) {
+            $q->where(function ($q) use ($keyword) {
+                $q->where('word', 'like', "%{$keyword}%");
+            });
+        })->orWhere('word', $keyword)->get();
+
+        dd($words);
+
+        foreach ($words as $word) {
+            $words1[] = $word;
+        }
+
+
+
+        foreach ($words as $items) {
+            dd($items);
+            foreach ($items->translateUa as $item) {
+                dd($item->word);
+            }
+        }
+
+
+
+        $words = DictionaryEN::where(function ($q) use ($keyword) {
+            $q->where('word', 'like', "%{$keyword}%")
+                ->whereHasMany('translateUa', function ($q) use ($keyword) {
+                    $q->where(function ($q) use ($keyword) {
+                        $q->where('word', 'like', "%{$keyword}%");
+                    });
+                });
+        })->orderBy('id', 'desc')->get();
+
+        $response = $this->formatResponse('success', null, $words1);
+        return response($response, 200);
     }
 }

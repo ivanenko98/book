@@ -31,6 +31,7 @@ class Book extends Model
         'rating',
         'genre',
         'translator',
+        'current_page',
     ];
 
     protected $appends = [
@@ -39,6 +40,7 @@ class Book extends Model
         'genre',
         'translator',
         'status',
+        'current_page',
     ];
 
     public function folder(){
@@ -102,6 +104,21 @@ class Book extends Model
 
         return null;
     }
+
+//    Current Page
+    public function getCurrentPageAttribute()
+    {
+        $user = Auth::user();
+
+        $purchased_book = $this->purchases()->where('buyer_id', $user->id)->first();
+
+        if ($purchased_book != null) {
+            return $purchased_book->current_page;
+        }
+
+        return null;
+    }
+//    End
 
     public function getRatingAttribute()
     {
